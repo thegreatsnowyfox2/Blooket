@@ -1,61 +1,52 @@
-// THIS IS THE REAL CHEAT ENGINE
-// It requires a backend token proxy to work on real games
-// Without backend, it runs in DEMO mode (shows explanations)
-
+// SIMPLIFIED CHEAT - DEMO MODE FIRST
 let activeGame = null;
 
 document.getElementById('joinBtn').onclick = async () => {
     const pin = document.getElementById('gamePin').value;
     const name = document.getElementById('playerName').value;
-    const incog = document.getElementById('incognito').getAttribute('checked') === 'true';
     
-    updateStatus('Joining game...');
-    
-    // Try to fetch token from a free proxy (you need to deploy this)
-    // For now, DEMO MODE
-    try {
-        const response = await fetch(`https://patient-smoke-6b67.thegreatsnowyfox2.workers.dev/`, {
-            method: 'POST',
-            body: JSON.stringify({ pin, name, incog }),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        if(data.success) {
-            activeGame = data;
-            initFirebase(data);
-            document.getElementById('cheatPanel').style.display = 'block';
-            updateStatus('✅ Connected! Cheats active.');
-            loadPlayerList();
-        } else {
-            demoMode(pin, name);
-        }
-    } catch(e) {
-        demoMode(pin, name);
+    if (!pin || !name) {
+        updateStatus('❌ Enter both Game PIN and Nickname!');
+        return;
     }
+    
+    updateStatus('🎮 DEMO MODE: Cheat UI ready (proxy not connected)');
+    document.getElementById('cheatPanel').style.display = 'block';
+    activeGame = { pin, name };
+    
+    // Load fake player list for demo
+    const select = document.getElementById('targetPlayer');
+    select.innerHTML = '<option>Player2</option><option>Host</option><option>Student1</option>';
 };
 
-function demoMode(pin, name) {
-    updateStatus('⚠️ DEMO MODE: Real cheats require backend proxy. Showing explanations only.');
-    document.getElementById('cheatPanel').style.display = 'block';
-    
-    document.getElementById('crashHostBtn').onclick = () => alert('💥 REAL CRASH: setUserVal("g/t","t") sends string to numeric field → host crashes. Need backend token.');
-    document.getElementById('freezeScoreboardBtn').onclick = () => alert('❄️ FREEZE: setUserVal("tat/t","t") injects CSS bomb. Need backend.');
-    document.getElementById('setGoldBtn').onclick = () => alert('✨ SET GOLD: setUserVal("g",99999) writes to Firebase. Need backend.');
-    document.getElementById('stealGoldBtn').onclick = () => alert('💰 STEAL: setUserVal("tat","target:amount") transfers gold. Need backend.');
-    document.getElementById('setBlookBtn').onclick = () => alert('🎭 CHANGE BLOOK: setUserVal("b","BlookName"). Need backend.');
-}
-
-function initFirebase(tokenData) {
-    // This would initialize Firebase with Blooket's config
-    // Actual code requires Firebase SDK import
-    console.log('Firebase ready', tokenData);
-}
-
-function loadPlayerList() {
-    // Would populate player dropdown from Firebase
-    const select = document.getElementById('targetPlayer');
-    select.innerHTML = '<option>You</option><option>Player2</option><option>Host</option>';
-}
+// DEMO BUTTONS - Show what they would do
+document.getElementById('crashHostBtn').onclick = () => {
+    alert('💥 REAL CRASH: Would send "g/t" = "t" to Firebase\n\nNeed Cloudflare Worker proxy for real effect');
+};
+document.getElementById('freezeScoreboardBtn').onclick = () => {
+    alert('❄️ FREEZE: Would send "tat/t" = "t" to Firebase\n\nNeed Cloudflare Worker proxy for real effect');
+};
+document.getElementById('setGoldBtn').onclick = () => {
+    const amount = document.getElementById('goldAmount').value || 99999;
+    alert(`✨ SET GOLD: Would write "g" = ${amount} to Firebase\n\nNeed Cloudflare Worker proxy for real effect`);
+};
+document.getElementById('stealGoldBtn').onclick = () => {
+    const target = document.getElementById('targetPlayer').value;
+    const amount = document.getElementById('stealAmount').value || 100;
+    alert(`💰 STEAL: Would write "tat" = "${target}:${amount}" to Firebase\n\nNeed Cloudflare Worker proxy for real effect`);
+};
+document.getElementById('setBlookBtn').onclick = () => {
+    const blook = document.getElementById('blookSelect').value;
+    alert(`🎭 CHANGE BLOOK: Would write "b" = "${blook}" to Firebase\n\nNeed Cloudflare Worker proxy for real effect`);
+};
+document.getElementById('leaveGameBtn').onclick = () => {
+    updateStatus('🚪 Left game (demo)');
+    document.getElementById('cheatPanel').style.display = 'none';
+    activeGame = null;
+};
+document.getElementById('floodAlertBtn').onclick = () => {
+    alert('📢 FLOOD ALERT: Would send 1000+ character string to "tat"\n\nNeed Cloudflare Worker proxy for real effect');
+};
 
 function updateStatus(msg) {
     document.getElementById('status').innerHTML = `Status: ${msg}`;
@@ -68,3 +59,5 @@ document.querySelectorAll('checkbox').forEach(cb => {
         else this.setAttribute('checked', 'true');
     });
 });
+
+updateStatus('Ready (Demo Mode - No proxy required)');
