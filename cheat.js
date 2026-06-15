@@ -14,7 +14,7 @@ document.getElementById('joinBtn').onclick = async () => {
     // Try to fetch token from a free proxy (you need to deploy this)
     // For now, DEMO MODE
     try {
-        const response = await fetch(`https://blooket-proxy.your-worker.workers.dev/join`, {
+        const response = await fetch(`https://patient-smoke-6b67.thegreatsnowyfox2.workers.dev/`, {
             method: 'POST',
             body: JSON.stringify({ pin, name, incog }),
             headers: { 'Content-Type': 'application/json' }
