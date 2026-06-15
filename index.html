@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>⚡ BLOOKET CHEAT PANEL ⚡</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 BLOOKET GODMODE CHEATS 🔥</h1>
+        <div class="join-section">
+            <input type="text" id="gamePin" placeholder="Game PIN (6-7 digits)" class="input">
+            <input type="text" id="playerName" placeholder="Your Nickname" class="input">
+            <div class="toggle-row">
+                <label>🔒 Incognito Mode:</label>
+                <checkbox id="incognito" checked="true"></checkbox>
+                <label>🎭 First Place Switch:</label>
+                <checkbox id="firstPlace" checked="true"></checkbox>
+            </div>
+            <button id="joinBtn">🎮 JOIN & ACTIVATE CHEATS 🎮</button>
+        </div>
+        <div id="status" class="status">Status: Ready</div>
+        <div id="cheatPanel" style="display: none;">
+            <div class="cheat-section">
+                <h2>💀 DESTRUCTIVE CHEATS</h2>
+                <button class="cheat-btn danger" id="crashHostBtn">💥 CRASH HOST</button>
+                <button class="cheat-btn danger" id="freezeScoreboardBtn">❄️ FREEZE SCOREBOARD</button>
+                <button class="cheat-btn danger" id="floodAlertBtn">📢 FLOOD ALERT BOX</button>
+            </div>
+            <div class="cheat-section">
+                <h2>💰 GOLD & RESOURCE CHEATS</h2>
+                <div class="input-group">
+                    <input type="number" id="goldAmount" placeholder="Gold amount" class="small-input">
+                    <button class="cheat-btn" id="setGoldBtn">✨ SET MY GOLD</button>
+                </div>
+                <div class="input-group">
+                    <select id="targetPlayer"></select>
+                    <input type="number" id="stealAmount" placeholder="Amount to steal">
+                    <button class="cheat-btn" id="stealGoldBtn">💰 STEAL GOLD</button>
+                </div>
+            </div>
+            <div class="cheat-section">
+                <h2>🎭 APPEARANCE & UTILITY</h2>
+                <select id="blookSelect">
+                    <option>Rainbow Astronaut</option><option>Megalodon</option><option>Santa Claus</option>
+                    <option>Mega Bot</option><option>Ghost</option><option>Dragon</option>
+                </select>
+                <button class="cheat-btn" id="setBlookBtn">🎭 CHANGE BLOOK</button>
+                <button class="cheat-btn" id="leaveGameBtn">🚪 LEAVE GAME</button>
+            </div>
+        </div>
+    </div>
+    <script src="cheat.js"></script>
+</body>
+</html>
