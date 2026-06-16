@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Homework</title>
-    <!-- Firebase SDK (compat version for older browsers) -->
+    <title>⚡ BLOOKET GODMODE ⚡</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
-        /* ---------- RESET & BASE ---------- */
-        * {
-            box-sizing: border-box;
-            touch-action: manipulation;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; touch-action: manipulation; margin: 0; padding: 0; }
         body {
             background: #0a0e1a;
-            font-family: 'Courier New', 'Fira Code', monospace;
+            font-family: 'Courier New', monospace;
             color: #0f0;
             padding: 16px;
             min-height: 100vh;
@@ -26,7 +19,6 @@
             justify-content: center;
             align-items: center;
         }
-        /* ---------- MAIN CONTAINER ---------- */
         .container {
             max-width: 700px;
             width: 100%;
@@ -35,32 +27,8 @@
             border-radius: 24px;
             padding: 24px;
             box-shadow: 0 0 40px #0f03;
-            backdrop-filter: blur(4px);
         }
-        h1 {
-            text-align: center;
-            font-size: 1.8rem;
-            text-shadow: 0 0 20px #0f0;
-            margin-bottom: 18px;
-            letter-spacing: 2px;
-            word-break: break-word;
-        }
-        /* ---------- INPUTS ---------- */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .input-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .input-row input {
-            flex: 1;
-            min-width: 140px;
-        }
+        h1 { text-align: center; font-size: 1.8rem; text-shadow: 0 0 20px #0f0; margin-bottom: 18px; }
         .input {
             background: #0a0a1a;
             border: 1.5px solid #0f0;
@@ -70,17 +38,63 @@
             font-size: 16px;
             font-family: inherit;
             outline: none;
-            transition: 0.2s;
             width: 100%;
+            margin-bottom: 10px;
         }
-        .input:focus {
-            border-color: #ff0;
-            box-shadow: 0 0 15px #0f04;
+        .input:focus { border-color: #ff0; box-shadow: 0 0 15px #0f04; }
+        .input::placeholder { color: #4a4a6a; }
+        .btn {
+            background: #1a3a1a;
+            border: 1.5px solid #0f0;
+            color: #0f0;
+            padding: 14px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            font-family: inherit;
+            width: 100%;
+            margin: 6px 0;
+            text-align: center;
+            min-height: 54px;
+            transition: 0.1s;
         }
-        .input::placeholder {
-            color: #4a4a6a;
+        .btn:active { background: #0f0; color: #000; transform: scale(0.97); }
+        .btn-primary { background: #0f0; color: #000; font-size: 18px; }
+        .btn-danger { border-color: #f44; color: #f88; background: #2a0a0a; }
+        .btn-warning { border-color: #fa0; color: #fa0; background: #2a1a0a; }
+        .btn-sm { padding: 10px 14px; font-size: 14px; min-height: 44px; }
+        .status {
+            margin: 14px 0;
+            padding: 12px 16px;
+            background: #0a0a1a;
+            border-left: 4px solid #0f0;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 48px;
         }
-        /* ---------- TOGGLES ---------- */
+        .status.error { border-left-color: #f44; color: #f88; }
+        .status.success { border-left-color: #0f0; color: #0f0; }
+        #cheatPanel { display: none; margin-top: 16px; }
+        .cheat-section { border-top: 1px solid #1a3a1a; padding-top: 14px; margin-top: 14px; }
+        .cheat-section h2 { font-size: 1rem; color: #afa; margin-bottom: 10px; }
+        .cheat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .cheat-grid-full { grid-column: 1 / -1; }
+        .input-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .input-inline .input { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 14px; margin-bottom: 0; }
+        .input-inline select {
+            flex: 1;
+            min-width: 100px;
+            background: #0a0a1a;
+            border: 1.5px solid #0f0;
+            color: #0f0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+        /* Toggle Switch - FIXED */
         .toggle-row {
             display: flex;
             align-items: center;
@@ -97,8 +111,9 @@
             align-items: center;
             gap: 8px;
             font-size: 14px;
+            cursor: pointer;
         }
-        checkbox {
+        .toggle-switch {
             display: inline-block;
             width: 44px;
             height: 24px;
@@ -106,13 +121,13 @@
             border-radius: 30px;
             position: relative;
             cursor: pointer;
-            transition: 0.25s;
             flex-shrink: 0;
+            transition: 0.25s;
         }
-        checkbox[checked] {
+        .toggle-switch.active {
             background: #0f0;
         }
-        checkbox::before {
+        .toggle-switch::after {
             content: '';
             position: absolute;
             width: 18px;
@@ -123,208 +138,43 @@
             left: 4px;
             transition: 0.25s;
         }
-        checkbox[checked]::before {
+        .toggle-switch.active::after {
             transform: translateX(20px);
         }
-        /* ---------- BUTTONS ---------- */
-        .btn {
-            background: #1a3a1a;
-            border: 1.5px solid #0f0;
-            color: #0f0;
-            padding: 14px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            font-family: inherit;
-            transition: 0.15s;
-            text-align: center;
-            min-height: 54px;
-            touch-action: manipulation;
-        }
-        .btn:active {
-            background: #0f0;
-            color: #000;
-            transform: scale(0.96);
-        }
-        .btn-primary {
-            background: #0f0;
-            color: #000;
-            font-size: 18px;
-            padding: 16px;
-            width: 100%;
-        }
-        .btn-primary:active {
-            background: #afa;
-        }
-        .btn-danger {
-            border-color: #f44;
-            color: #f88;
-            background: #2a0a0a;
-        }
-        .btn-danger:active {
-            background: #f44;
-            color: #000;
-        }
-        .btn-warning {
-            border-color: #fa0;
-            color: #fa0;
-            background: #2a1a0a;
-        }
-        .btn-warning:active {
-            background: #fa0;
-            color: #000;
-        }
-        .btn-sm {
-            padding: 8px 14px;
-            font-size: 13px;
-            min-height: 40px;
-        }
-        .btn-block {
-            width: 100%;
-        }
-        /* ---------- STATUS ---------- */
-        .status {
-            margin: 14px 0;
-            padding: 12px 16px;
-            background: #0a0a1a;
-            border-left: 4px solid #0f0;
-            border-radius: 8px;
-            font-size: 14px;
-            word-break: break-word;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-        }
-        .status.error {
-            border-left-color: #f44;
-            color: #f88;
-        }
-        .status.success {
-            border-left-color: #0f0;
-            color: #0f0;
-        }
-        /* ---------- CHEAT PANEL ---------- */
-        #cheatPanel {
-            display: none;
-            margin-top: 16px;
-        }
-        .cheat-section {
-            border-top: 1px solid #1a3a1a;
-            padding-top: 14px;
-            margin-top: 14px;
-        }
-        .cheat-section h2 {
-            font-size: 1rem;
-            color: #afa;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-        }
-        .cheat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .cheat-grid .btn {
-            width: 100%;
-        }
-        .cheat-grid-full {
-            grid-column: 1 / -1;
-        }
-        .input-inline {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .input-inline .input {
-            flex: 1;
-            min-width: 80px;
-            padding: 10px 12px;
-            font-size: 14px;
-        }
-        .input-inline select {
-            flex: 1;
-            min-width: 100px;
-            background: #0a0a1a;
-            border: 1.5px solid #0f0;
-            color: #0f0;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-        }
-        .input-inline select option {
-            background: #0a0a1a;
-        }
-        /* ---------- RESPONSIVE ---------- */
-        @media (max-width: 550px) {
-            .cheat-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 16px;
-            }
-            h1 {
-                font-size: 1.4rem;
-            }
-            .input-row {
-                flex-direction: column;
-            }
-            .input-row input {
-                min-width: unset;
-            }
-            .toggle-row {
-                gap: 10px;
-            }
-            .btn {
-                font-size: 14px;
-                padding: 12px 16px;
-                min-height: 48px;
-            }
-        }
-        /* ---------- UTILITY ---------- */
-        .mt-1 { margin-top: 10px; }
-        .mb-1 { margin-bottom: 10px; }
-        .flex { display: flex; gap: 8px; flex-wrap: wrap; }
-        .flex-center { align-items: center; }
         .text-muted { color: #6a6a8a; font-size: 12px; text-align: center; margin-top: 16px; }
+        @media (max-width: 550px) {
+            .cheat-grid { grid-template-columns: 1fr; }
+            .container { padding: 16px; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Homework</h1>
+    <h1>⚡ BLOOKET GODMODE ⚡</h1>
 
-    <!-- JOIN SECTION -->
-    <div class="input-group">
-        <div class="input-row">
-            <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric">
-            <input type="text" id="playerName" class="input" placeholder="Your Nickname">
-        </div>
-        <div class="toggle-row">
-            <span class="toggle-item">
-                <checkbox id="incognito" checked="true"></checkbox>
-                <span>🔒 Incognito</span>
-            </span>
-            <span class="toggle-item">
-                <checkbox id="firstPlace" checked="true"></checkbox>
-                <span>🎭 First Place</span>
-            </span>
-            <span class="toggle-item">
-                <checkbox id="bypassFilter"></checkbox>
-                <span>🚫 Bypass Filter</span>
-            </span>
-        </div>
-        <button class="btn btn-primary" id="joinBtn">🎮 JOIN & ACTIVATE</button>
+    <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric">
+    <input type="text" id="playerName" class="input" placeholder="Your Nickname">
+
+    <div class="toggle-row">
+        <span class="toggle-item" onclick="toggleSwitch(this)">
+            <span class="toggle-switch active" id="incognito"></span>
+            🔒 Incognito
+        </span>
+        <span class="toggle-item" onclick="toggleSwitch(this)">
+            <span class="toggle-switch active" id="firstPlace"></span>
+            🎭 First Place
+        </span>
+        <span class="toggle-item" onclick="toggleSwitch(this)">
+            <span class="toggle-switch" id="bypassFilter"></span>
+            🚫 Bypass Filter
+        </span>
     </div>
 
-    <!-- STATUS -->
+    <button class="btn btn-primary" id="joinBtn">🎮 JOIN & ACTIVATE</button>
+
     <div id="status" class="status">🔹 Status: Ready</div>
 
-    <!-- CHEAT PANEL -->
     <div id="cheatPanel">
-        <!-- DESTRUCTIVE -->
         <div class="cheat-section">
             <h2>💀 DESTRUCTIVE</h2>
             <div class="cheat-grid">
@@ -334,7 +184,6 @@
             </div>
         </div>
 
-        <!-- GOLD / RESOURCES -->
         <div class="cheat-section">
             <h2>💰 GOLD & RESOURCES</h2>
             <div class="cheat-grid">
@@ -350,7 +199,6 @@
             </div>
         </div>
 
-        <!-- BLOOK / UTILITY -->
         <div class="cheat-section">
             <h2>🎭 BLOOK & UTILITY</h2>
             <div class="cheat-grid">
@@ -359,7 +207,6 @@
                         <option>Rainbow Astronaut</option><option>Megalodon</option>
                         <option>Santa Claus</option><option>Mega Bot</option>
                         <option>Ghost</option><option>Dragon</option>
-                        <option>Kraken</option><option>Unicorn</option>
                     </select>
                     <button class="btn btn-sm" id="setBlookBtn">🎭 Change Blook</button>
                     <button class="btn btn-sm btn-warning" id="leaveGameBtn">🚪 Leave</button>
@@ -367,12 +214,9 @@
             </div>
         </div>
 
-        <!-- FREEZE HOST (Global) -->
         <div class="cheat-section">
             <h2>🧊 GLOBAL</h2>
-            <div class="cheat-grid">
-                <button class="btn btn-danger cheat-grid-full" id="freezeHostBtn">🧊 Freeze Host</button>
-            </div>
+            <button class="btn btn-danger" id="freezeHostBtn">🧊 Freeze Host</button>
         </div>
 
         <div class="text-muted">🔒 All actions require an active game connection.</div>
@@ -381,38 +225,43 @@
 
 <script>
 // ============================================================
-//  COMPLETE CHEAT ENGINE — WORKS WITH YOUR WORKER
+//  FIXED CHEAT ENGINE — ALL BUTTONS AND TOGGLES WORK
 // ============================================================
 
+// ---------- TOGGLE SWITCH (FIXED) ----------
+function toggleSwitch(el) {
+    const toggle = el.querySelector('.toggle-switch');
+    if (toggle) {
+        toggle.classList.toggle('active');
+    }
+}
+
+// ---------- CHECK TOGGLE STATE ----------
+function isToggled(id) {
+    const el = document.getElementById(id);
+    return el ? el.classList.contains('active') : false;
+}
+
 // ---------- CONFIG ----------
-// ⚠️ REPLACE THIS WITH YOUR ACTUAL WORKER URL
-const WORKER_URL = https://blooket-bot.thegreatsnowyfox2.workers.dev/';
+const WORKER_URL ='https://blooket-proxy.thegreatsnowyfox2.workers.dev'; // ⚠️ UPDATE THIS
 
 // ---------- STATE ----------
-let activeGame = null;       // { pin, name }
-let db = null;              // Firebase database reference
-let auth = null;            // Firebase auth
+let activeGame = null;
+let db = null;
+let auth = null;
 let firebaseApp = null;
 
 // ---------- DOM REFS ----------
 const $ = id => document.getElementById(id);
-const statusEl = $('status');
-const cheatPanel = $('cheatPanel');
-
-// ---------- CHECKBOX TOGGLE ----------
-document.querySelectorAll('checkbox').forEach(cb => {
-    cb.addEventListener('click', function() {
-        if (this.hasAttribute('checked')) this.removeAttribute('checked');
-        else this.setAttribute('checked', 'true');
-    });
-});
 
 // ---------- UPDATE STATUS ----------
 function setStatus(msg, type = 'info') {
-    statusEl.textContent = '🔹 ' + msg;
-    statusEl.className = 'status';
-    if (type === 'error') statusEl.classList.add('error');
-    if (type === 'success') statusEl.classList.add('success');
+    const el = $('status');
+    if (!el) return;
+    el.textContent = '🔹 ' + msg;
+    el.className = 'status';
+    if (type === 'error') el.classList.add('error');
+    if (type === 'success') el.classList.add('success');
     console.log('[Status]', msg);
 }
 
@@ -428,7 +277,6 @@ $('joinBtn').onclick = async () => {
     setStatus('🔑 Contacting Worker for token...', 'info');
 
     try {
-        // 1. Call your Worker
         const resp = await fetch(`${WORKER_URL}/join`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -445,7 +293,6 @@ $('joinBtn').onclick = async () => {
 
         setStatus('🔥 Connecting to Firebase...', 'info');
 
-        // 2. Initialize Firebase
         if (firebaseApp) {
             await firebaseApp.delete();
             firebaseApp = null;
@@ -464,17 +311,15 @@ $('joinBtn').onclick = async () => {
         activeGame = { pin, name };
 
         setStatus(`✅ Connected to game ${pin} as "${name}"! Cheats active.`, 'success');
-        cheatPanel.style.display = 'block';
+        $('cheatPanel').style.display = 'block';
 
-        // 3. Load player list for steal dropdown
         loadPlayerList();
 
-        // 4. Listen for game updates (optional)
         db.ref(`${pin}/c`).on('value', (snap) => {
             const players = snap.val();
             if (players && !players[name]) {
                 setStatus('⚠️ You were removed from the game!', 'error');
-                cheatPanel.style.display = 'none';
+                $('cheatPanel').style.display = 'none';
                 activeGame = null;
             }
         });
@@ -482,8 +327,7 @@ $('joinBtn').onclick = async () => {
     } catch (err) {
         setStatus('❌ ' + err.message, 'error');
         console.error(err);
-        // Fallback: show demo panel
-        cheatPanel.style.display = 'block';
+        $('cheatPanel').style.display = 'block';
         setStatus('⚠️ DEMO MODE: Worker not connected. Explanations only.', 'error');
         enableDemoMode();
     }
@@ -546,7 +390,7 @@ $('leaveGameBtn').onclick = async () => {
     try {
         await db.ref(`/${activeGame.pin}/c/${activeGame.name}`).remove();
         setStatus('🚪 Left game', 'info');
-        cheatPanel.style.display = 'none';
+        $('cheatPanel').style.display = 'none';
         activeGame = null;
         if (firebaseApp) {
             await firebaseApp.delete();
@@ -564,7 +408,6 @@ $('floodAlertBtn').onclick = async () => {
 };
 
 $('freezeHostBtn').onclick = async () => {
-    // This writes a massive string to the host's game state
     const longText = 'A'.repeat(300000);
     const ok = await firebaseWrite('g', longText);
     if (ok) setStatus('🧊 Freeze sent! Host may lag.', 'success');
@@ -600,13 +443,12 @@ async function loadPlayerList() {
     }
 }
 
-// ---------- DEMO MODE (FALLBACK) ----------
+// ---------- DEMO MODE ----------
 function enableDemoMode() {
     const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn', 'freezeHostBtn'];
     btns.forEach(id => {
         const btn = $(id);
         if (btn && !btn._demo) {
-            const orig = btn.onclick;
             btn.onclick = () => {
                 alert('🔴 REAL CHEAT: Would write to Firebase.\n\nCheck Worker connection and try again.');
             };
