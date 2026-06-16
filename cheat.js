@@ -3,7 +3,7 @@
 // ============================================================
 
 // ─── CONFIG ───
-const PROXY_URL = 'https://YOUR_WORKER_URL_HERE'; // <-- CHANGE THIS
+const PROXY_URL = 'bot.thegreatsnowyfox2.workers.dev/'; // <-- CHANGE THIS
 
 let activeGame = null;
 let db = null;
