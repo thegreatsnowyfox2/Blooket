@@ -4,7 +4,7 @@ let db = null;
 let auth = null;
 
 // Your LIVE worker URL
-const WORKER_URL = 'https://patient-smoke-6b67.thegreatsnowyfox2.workers.dev';
+const WORKER_URL = 'https://blooket-bot.thegreatsnowyfox2.workers.dev/';
 
 // Firebase config (Blooket's public keys)
 const firebaseConfig = {
