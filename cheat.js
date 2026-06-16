@@ -4,7 +4,7 @@
 // ============================================================
 
 // ⚠️ REPLACE THIS WITH YOUR ACTUAL WORKER URL
-const PROXY_URL = 'https://blooket-proxy.thegreatsnowyfox2.workers.dev';
+const PROXY_URL = 'https://blooket-bot.thegreatsnowyfox2.workers.dev/';
 
 let activeGame = null;
 let db = null;
