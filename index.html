@@ -1,8 +1,7 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<!-- This site is hosted on Netlify. Anyone can build and deploy a site
-     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=48a6a1e6-c106-4f46-9da3-e24cb4ad958a
-     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -67,18 +66,20 @@ html{-webkit-text-size-adjust:100%}
 @media (max-width:1100px){#player{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}}
 #gate{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);padding:20px}
 #gate form{width:min(360px,100%);display:grid;gap:14px}
-#gate input{padding:12px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-size:16px}
+#gate input{padding:12px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-size:16px;letter-spacing:.06em;text-transform:uppercase}
+#gate input::placeholder{text-transform:none;letter-spacing:0}
 body:not(.locked) #gate{display:none}body.locked main{display:none}
-[hidden]{display:none!important}.admin-only{display:none!important}body.admin .admin-only{display:inline-block!important}.cgrid{display:grid;gap:10px}.mono{font:.8rem/1.4 monospace;word-break:break-all;color:var(--mute)}
+[hidden]{display:none!important}.admin-only{display:none!important}body.admin .admin-only{display:inline-block!important}.cgrid{display:grid;gap:10px}
+.mono{font:.8rem/1.4 monospace;word-break:break-all;color:var(--mute);user-select:all;white-space:pre-wrap}
 @media (prefers-reduced-motion:no-preference){.game{transition:transform .15s}.game:hover{transform:translateY(-3px)}}
 </style>
 </head>
-<body class="">
-<div id="gate" role="dialog" aria-label="Enter password">
+<body class="locked">
+<div id="gate" role="dialog" aria-label="Enter access key">
   <form id="gform">
     <h1>Game <span>Shelf</span></h1>
-    <p class="sub">This site is private.</p>
-    <input id="gpw" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Password" autocomplete="current-password" aria-label="Password">
+    <p class="sub">This site is private. Enter your access key.</p>
+    <input id="gpw" type="text" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="Access key" autocomplete="off" aria-label="Access key">
     <p class="err" id="gerr" role="alert"></p>
     <button class="btn" type="button" id="gbtn">Enter</button>
     <noscript><p class="err">This page needs JavaScript. Open it in Safari from your site link, not as a file preview.</p></noscript>
@@ -98,12 +99,12 @@ body:not(.locked) #gate{display:none}body.locked main{display:none}
     <div class="chips" id="chips"><button class="chip" aria-pressed="true">All</button></div>
   </div>
 
-  <div class="grid" id="grid"><article class="game"><div class="cover" style="background: rgb(23, 163, 152);">B</div><div class="info"><h2>Balatro</h2><p></p><div class="actions"><a href="https://telatro.tomcat.sh/game/" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(58, 125, 68);">B</div><div class="info"><h2>Binding of isaac</h2><p></p><div class="actions"><a href="https://tboi.online/" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(45, 60, 255);">B</div><div class="info"><h2>brotato</h2><p></p><div class="actions"><a href="https://wasm.rip/files/bpac/index.html" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(216, 30, 91);">C</div><div class="info"><h2>cloverpit</h2><p></p><div class="actions"><a href="https://genizymath.github.io/iframe/716-fix3.html" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article></div>
+  <div class="grid" id="grid"></div>
 
   <footer>
-    <span id="count">4 games</span>
+    <span id="count">0 games</span>
     <button class="btn ghost" id="console" style="margin-left:auto">Console</button>
-    <input type="file" id="file" accept="application/json" hidden="">
+    <input type="file" id="file" accept="application/json" hidden>
   </footer>
 </main>
 
@@ -122,23 +123,29 @@ body:not(.locked) #gate{display:none}body.locked main{display:none}
 </dialog>
 
 <dialog id="con">
-  <h2>Dev console</h2>
+  <h2>Console</h2>
   <div id="locked">
-    <label for="pw">Password</label>
+    <label for="pw">Admin password</label>
     <input id="pw" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="current-password">
     <p class="err" id="pwerr" role="alert"></p>
     <div class="row"><button class="btn ghost" id="pwcancel">Close</button><button class="btn" id="unlock">Unlock</button></div>
   </div>
-  <div id="panel" class="cgrid" hidden="">
+  <div id="panel" class="cgrid" hidden>
     <p class="tag" style="margin:0">Unlocked. Add and Remove buttons are now visible on the page.</p>
     <button class="btn ghost" id="export">Download games.json</button>
     <button class="btn ghost" id="import">Import games.json</button>
+
+    <label for="kname" style="margin-bottom:0">New access key</label>
+    <input id="kname" placeholder="Name (e.g. Sam)" autocomplete="off" maxlength="30">
+    <input id="kdays" type="number" min="1" placeholder="Expires in days (blank = never)" aria-label="Expires in days">
+    <button class="btn ghost" id="kgen">Generate key</button>
+    <div class="mono" id="kout"></div>
+    <label style="margin-bottom:0">Active keys</label>
+    <div id="klist" class="cgrid"></div>
+
     <label for="pxurl" style="margin-bottom:0">Server address (your Cloudflare Worker)</label>
     <input id="pxurl" type="url" placeholder="https://something.workers.dev">
-    <p class="tag" style="margin:0">Saved in this browser only. For all visitors, also paste it into SERVER in index.html.</p>
-    <label for="newpw" style="margin-bottom:0">Local-only password hash (used when no server is set)</label>
-    <input id="newpw" placeholder="Type a new password" autocomplete="off">
-    <div class="mono" id="newhash"></div>
+    <p class="tag" style="margin:0">Saved in this browser only. Leave blank to use the address in index.html.</p>
     <div class="row"><button class="btn ghost" id="lock">Lock</button><button class="btn" id="close">Done</button></div>
   </div>
 </dialog>
@@ -147,9 +154,9 @@ body:not(.locked) #gate{display:none}body.locked main{display:none}
   <form method="dialog" id="form">
     <h2>Add a game</h2>
     <label for="f-title">Title</label>
-    <input id="f-title" required="" maxlength="60">
+    <input id="f-title" required maxlength="60">
     <label for="f-url">Link to play</label>
-    <input id="f-url" type="url" required="" placeholder="https://">
+    <input id="f-url" type="url" required placeholder="https://">
     <label for="f-genre">Genre</label>
     <input id="f-genre" list="genres" placeholder="Puzzle, Racing, Platformer…" maxlength="24">
     <datalist id="genres"><option>Puzzle</option><option>Arcade</option><option>Action</option><option>Strategy</option><option>Racing</option><option>Platformer</option></datalist>
@@ -168,26 +175,26 @@ body:not(.locked) #gate{display:none}body.locked main{display:none}
 
 <script>
 window.addEventListener("error",e=>{const g=document.getElementById("gerr");if(g)g.textContent="Error: "+e.message});
-// No games ship with the site. To add games for every visitor, put a games.json
-// next to this file (see README) and it replaces these.
-const SEED = [];
-const PASS_HASH="676030ce34acea9f714a50288e162e2b65af79d2a5888faabddda1806dcb12b3"; // console password (SHA-256 of "gameshelf:" + password)
-const SITE_HASH="676030ce34acea9f714a50288e162e2b65af79d2a5888faabddda1806dcb12b3"; // site password, asked before anyone can see the page
-const SERVER="https://shy-wave-a7eb.thegreatsnowyfox.workers.dev";       // paste your Cloudflare Worker URL here: it stores the shared game list and runs the proxy
-const KEY="gameshelf:v1";
+const SERVER="https://shy-wave-a7eb.thegreatsnowyfox.workers.dev"; // your Cloudflare Worker (worker.js)
 const COLORS=["#2D3CFF","#E4572E","#17A398","#7B2CBF","#D81E5B","#3A7D44","#F18F01"];
-let mem={added:[],hidden:[]};   // fallback if storage is blocked
-let base=SEED, filter="All";
+let base=[], filter="All", cur=null;
 const $=id=>document.getElementById(id);
-
-function load(){try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.added))return v}catch(e){}return mem}
-function save(d){mem=d;try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
 const safeUrl=u=>{try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:null}catch(e){return null}};
-let serverOn=false;
-const all=()=>{if(serverOn)return base;const d=load();return base.concat(d.added).filter(g=>!d.hidden.includes(g.id))};
+const server=()=>{try{return (localStorage.getItem("gs-proxy")||SERVER).replace(/\/$/,"")}catch(e){return SERVER}};
+const getKey=()=>{try{return localStorage.getItem("gs-key")||""}catch(e){return ""}};
+const pwd=()=>{try{return sessionStorage.getItem("gs-pw")||""}catch(e){return ""}};
+const cred=()=>pwd()||getKey();
+const proxySrc=href=>server()+"?url="+encodeURIComponent(href)+"&k="+encodeURIComponent(getKey());
+
+async function api(method,path,body){
+  const r=await fetch(server()+path,{method,headers:{"X-Admin-Password":pwd(),"X-Access-Key":cred(),"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){const e=new Error("Not allowed");e.status=401;throw e}
+  if(!r.ok)throw new Error("Server error "+r.status);
+  return r.json();
+}
 
 function render(){
-  const games=all(), q=$("q").value.trim().toLowerCase();
+  const games=base, q=$("q").value.trim().toLowerCase();
   const genres=["All",...new Set(games.map(g=>g.genre).filter(Boolean))];
   if(!genres.includes(filter))filter="All";
   const chips=$("chips");chips.textContent="";
@@ -208,7 +215,9 @@ function render(){
     const t=document.createElement("h2");t.textContent=g.title;
     const p=document.createElement("p");p.textContent=g.desc||"";
     const acts=document.createElement("div");acts.className="actions";
-    const a=document.createElement("a");const href=safeUrl(g.url);a.href=g.proxy&&serverBase()&&href?serverBase()+"?url="+encodeURIComponent(href):href||"#";a.target="_blank";a.rel="noopener noreferrer";a.textContent="Play";a.onclick=e=>{if(a.getAttribute("href")!=="#"){e.preventDefault();play(g)}};
+    const a=document.createElement("a");const href=safeUrl(g.url);
+    a.href=g.proxy&&href?proxySrc(href):href||"#";a.target="_blank";a.rel="noopener noreferrer";a.textContent="Play";
+    a.onclick=e=>{if(a.getAttribute("href")!=="#"){e.preventDefault();play(g)}};
     const rm=document.createElement("button");rm.className="admin-only";rm.textContent="Remove";rm.onclick=()=>remove(g);
     acts.append(a,rm);
     info.append(t);
@@ -218,31 +227,20 @@ function render(){
   $("count").textContent=games.length+(games.length===1?" game":" games");
 }
 
-function remove(g){
-  if(g.srv){api("DELETE","/games/"+encodeURIComponent(g.id)).then(refresh).catch(x=>alert("Couldn't remove: "+x.message));return}
-  const d=load();
-  if(d.added.some(x=>x.id===g.id))d.added=d.added.filter(x=>x.id!==g.id);else d.hidden.push(g.id);
-  save(d);render();
-}
-
-let cur=null;
 const HINT="Blank screen? That site doesn't allow embedding. Switch Proxy on above, or use Open in new tab.";
-function serverBase(){try{return localStorage.getItem("gs-proxy")||SERVER}catch(e){return SERVER}}
 function loadGame(){
-  const direct=safeUrl(cur.url),pb=serverBase(),on=$("pproxy").checked;
-  $("phint").textContent=on&&!pb?"No server address set yet. Unlock the Console, paste your Worker address, then try again.":HINT;
-  const src=on&&pb?pb+"?url="+encodeURIComponent(direct):direct;
+  const direct=safeUrl(cur.url),on=$("pproxy").checked;
+  $("phint").textContent=on&&!getKey()?"Proxy needs an access key. Sign out of admin and enter a key at the gate, or generate one for yourself.":HINT;
+  const src=on&&getKey()?proxySrc(direct):direct;
   $("pframe").src=src;$("pnew").href=src;
 }
-function play(g){
-  cur=g;$("ptitle").textContent=g.title;
-  $("pproxy").checked=!!(g.proxy&&serverBase());
-  loadGame();$("player").showModal();
-}
+function play(g){cur=g;$("ptitle").textContent=g.title;$("pproxy").checked=!!(g.proxy&&getKey());loadGame();$("player").showModal()}
 $("pproxy").onchange=loadGame;
 $("pclose").onclick=()=>$("player").close();
 $("pfull").onclick=()=>{const f=$("pframe");(f.requestFullscreen||f.webkitRequestFullscreen||(()=>{})).call(f)};
 $("player").addEventListener("close",()=>{$("pframe").src="about:blank"});
+
+function remove(g){api("DELETE","/games/"+encodeURIComponent(g.id)).then(refresh).catch(x=>alert("Couldn't remove: "+x.message))}
 const dlg=$("dlg");
 $("open").onclick=()=>{$("form").reset();$("err").textContent="";dlg.showModal();$("f-title").focus()};
 $("cancel").onclick=()=>dlg.close();
@@ -251,13 +249,12 @@ $("form").addEventListener("submit",e=>{
   if(!url){e.preventDefault();$("err").textContent="Enter a link that starts with http:// or https://";return}
   if(imgRaw&&!safeUrl(imgRaw)){e.preventDefault();$("err").textContent="The cover image link must start with http:// or https://";return}
   const g={id:"u"+Date.now(),title:$("f-title").value.trim(),url,genre:$("f-genre").value.trim(),img:imgRaw,desc:$("f-desc").value.trim(),proxy:$("f-proxy").checked};
-  if(serverBase()){api("POST","/games",g).then(refresh).catch(x=>alert("Couldn't save to the server: "+x.message));return}
-  const d=load();d.added.push(g);save(d);render();
+  api("POST","/games",g).then(refresh).catch(x=>alert("Couldn't save: "+x.message));
 });
 $("q").oninput=render;
 
 $("export").onclick=()=>{
-  const blob=new Blob([JSON.stringify(all(),null,2)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify(base.map(({srv,...g})=>g),null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="games.json";a.click();URL.revokeObjectURL(a.href);
 };
 $("import").onclick=()=>$("file").click();
@@ -265,213 +262,82 @@ $("file").onchange=async e=>{
   try{
     const arr=JSON.parse(await e.target.files[0].text());
     if(!Array.isArray(arr))throw 0;
-    if(serverBase()){await api("POST","/games",arr.filter(g=>g&&g.title&&safeUrl(g.url)));await refresh();e.target.value="";return}
-    const d=load(), ids=new Set(all().map(g=>g.id));
-    arr.filter(g=>g&&g.title&&safeUrl(g.url)&&!ids.has(g.id)).forEach(g=>d.added.push({id:g.id||"i"+Math.random().toString(36).slice(2),title:String(g.title),url:g.url,genre:g.genre||"",img:g.img||"",desc:g.desc||"",proxy:!!g.proxy}));
-    save(d);render();
+    await api("POST","/games",arr.filter(g=>g&&g.title&&safeUrl(g.url)));await refresh();
   }catch(err){alert("That file isn't a valid games.json.")}
   e.target.value="";
 };
 
-function sha256js(str){
-  const b=new TextEncoder().encode(str),l=b.length,n=((l+9+63)>>6)<<4,w=new Uint32Array(n);
-  for(let i=0;i<l;i++)w[i>>2]|=b[i]<<(24-8*(i&3));
-  w[l>>2]|=0x80<<(24-8*(l&3));w[n-1]=l*8;
-  const K=[],H=[];
-  for(let p=2;K.length<64;p++){let q=true;for(let d=2;d*d<=p;d++)if(p%d===0){q=false;break}
-    if(q){if(H.length<8)H.push(Math.floor((Math.sqrt(p)%1)*4294967296)|0);K.push(Math.floor((Math.cbrt(p)%1)*4294967296)|0)}}
-  const r=(x,k)=>(x>>>k)|(x<<(32-k));
-  for(let o=0;o<n;o+=16){
-    const W=new Int32Array(64);for(let i=0;i<16;i++)W[i]=w[o+i];
-    for(let i=16;i<64;i++){const x=W[i-15],y=W[i-2];W[i]=(W[i-16]+(r(x,7)^r(x,18)^(x>>>3))+W[i-7]+(r(y,17)^r(y,19)^(y>>>10)))|0}
-    let [a,b2,c,d,e,f,g,h]=H;
-    for(let i=0;i<64;i++){
-      const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+W[i])|0,t2=((r(a,2)^r(a,13)^r(a,22))+((a&b2)^(a&c)^(b2&c)))|0;
-      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0}
-    [a,b2,c,d,e,f,g,h].forEach((v,i)=>H[i]=(H[i]+v)|0)}
-  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("")
-}
-const sha=async t=>{const m="gameshelf:"+t;try{if(window.crypto&&crypto.subtle){const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(m));return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join("")}}catch(e){}return sha256js(m)};
-function setAdmin(on){document.body.classList.toggle("admin",on);$("locked").hidden=on;$("panel").hidden=!on;try{on?sessionStorage.setItem("gs-admin","1"):sessionStorage.removeItem("gs-admin")}catch(e){}}
+// Admin console
+function setAdmin(on){document.body.classList.toggle("admin",on);$("locked").hidden=on;$("panel").hidden=!on;try{on?sessionStorage.setItem("gs-admin","1"):sessionStorage.removeItem("gs-admin")}catch(e){}if(on)loadKeys()}
 $("pxurl").onchange=e=>{const v=e.target.value.trim();try{v?localStorage.setItem("gs-proxy",v):localStorage.removeItem("gs-proxy")}catch(x){}refresh()};
-$("console").onclick=()=>{try{$("pxurl").value=localStorage.getItem("gs-proxy")||SERVER}catch(x){}$("pw").value="";$("pwerr").textContent="";$("con").showModal()};
+$("console").onclick=()=>{try{$("pxurl").value=localStorage.getItem("gs-proxy")||""}catch(x){}$("pw").value="";$("pwerr").textContent="";$("con").showModal()};
 $("unlock").onclick=async()=>{
-  const v=$("pw").value.trim();
-  try{
-    if(serverBase()){
-      try{sessionStorage.setItem("gs-pw",v)}catch(e){}
-      try{await api("POST","/auth")}catch(e){try{sessionStorage.removeItem("gs-pw")}catch(x){}$("pwerr").textContent=e.message==="Wrong password"?"Wrong password.":"Couldn't reach the server.";return}
-      setAdmin(true);
-    }else if(await sha(v)===PASS_HASH)setAdmin(true);
-    else $("pwerr").textContent="Wrong password.";
-  }catch(e){$("pwerr").textContent="Password check needs https or localhost."}
+  try{sessionStorage.setItem("gs-pw",$("pw").value.trim())}catch(e){}
+  try{await api("POST","/auth");setAdmin(true)}
+  catch(e){try{sessionStorage.removeItem("gs-pw")}catch(x){}$("pwerr").textContent=e.status===401?"Wrong password.":"Couldn't reach the server."}
 };
 $("pw").onkeydown=e=>{if(e.key==="Enter")$("unlock").click()};
 $("pwcancel").onclick=$("close").onclick=()=>$("con").close();
 $("lock").onclick=()=>{try{sessionStorage.removeItem("gs-pw")}catch(e){}setAdmin(false);$("con").close()};
-$("newpw").oninput=async e=>{$("newhash").textContent=e.target.value?await sha(e.target.value):""};
+
+const fmt=d=>new Date(d).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+async function loadKeys(){
+  const box=$("klist");
+  try{
+    const keys=await api("GET","/keys");box.textContent="";
+    if(!keys.length){const p=document.createElement("p");p.className="tag";p.style.margin="0";p.textContent="No keys yet.";box.append(p);return}
+    keys.forEach(k=>{
+      const row=document.createElement("div");row.style.cssText="display:flex;gap:8px;align-items:center;justify-content:space-between";
+      const info=document.createElement("span");info.className="tag";
+      const expired=k.exp&&Date.now()>Date.parse(k.exp);
+      info.textContent=k.name+", "+(k.exp?(expired?"expired "+fmt(k.exp):"expires "+fmt(k.exp)):"no expiry");
+      const b=document.createElement("button");b.className="btn ghost";b.textContent="Revoke";
+      b.onclick=async()=>{if(!confirm("Revoke the key for "+k.name+"? They lose access right away."))return;
+        try{await api("DELETE","/keys/"+k.id);loadKeys()}catch(e){alert("Couldn't revoke: "+e.message)}};
+      row.append(info,b);box.append(row);
+    });
+  }catch(e){box.textContent="Couldn't load keys."}
+}
+$("kgen").onclick=async()=>{
+  try{
+    const k=await api("POST","/keys",{name:$("kname").value.trim(),days:Number($("kdays").value)||0});
+    $("kout").textContent="Key for "+k.name+": "+k.key+"\nCopy it now. It can't be shown again.";
+    $("kname").value="";$("kdays").value="";loadKeys();
+  }catch(e){$("kout").textContent="Couldn't create key: "+e.message}
+};
 try{if(sessionStorage.getItem("gs-admin"))setAdmin(true)}catch(e){}
 
-// If the repo has a games.json, use it as the shared list for all visitors.
-const pwd=()=>{try{return sessionStorage.getItem("gs-pw")||""}catch(e){return ""}};
-async function api(method,path,body){
-  const r=await fetch(serverBase().replace(/\/$/,"")+path,{method,headers:{"X-Admin-Password":pwd(),"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
-  if(!r.ok)throw new Error(r.status===401?"Wrong password":"Server error "+r.status);
+// Access gate: the Worker checks the key every time, so revoking is instant.
+const refresh=()=>api("GET","/games").then(g=>{base=g;render()}).catch(e=>{if(e.status===401)lockOut("Your access has ended. Enter a new key.")});
+function lockOut(msg){
+  try{localStorage.removeItem("gs-key");sessionStorage.removeItem("gs-pw")}catch(e){}
+  document.body.classList.add("locked");$("gerr").textContent=msg||"";
+}
+function start(){document.body.classList.remove("locked");refresh()}
+async function check(v){
+  const r=await fetch(server()+"/check",{method:"POST",headers:{"X-Access-Key":v}});
+  if(r.status===401)return null;
+  if(!r.ok)throw new Error("server");
   return r.json();
 }
-async function loadBase(){
-  const sb=serverBase();serverOn=false;
-  if(sb){try{const r=await fetch(sb.replace(/\/$/,"")+"/games",{cache:"no-store"});if(r.ok){base=(await r.json()).map(g=>({...g,srv:true}));serverOn=true;return}}catch(e){}}
-  base=SEED;
-  try{const r=await fetch("games.json",{cache:"no-cache"});const j=r.ok?await r.json():null;if(Array.isArray(j)&&j.length)base=j.map((g,i)=>({id:g.id||"r"+i,...g}))}catch(e){}
-}
-const refresh=()=>loadBase().then(render);
-function start(){document.body.classList.remove("locked");refresh()}
-try{if(localStorage.getItem("gs-site")===SITE_HASH)start()}catch(e){}
 async function trySite(){
+  const v=$("gpw").value.trim();
+  if(!v){$("gerr").textContent="Enter your access key.";return}
   $("gerr").textContent="Checking...";
   try{
-    if(await sha($("gpw").value.trim())===SITE_HASH){try{localStorage.setItem("gs-site",SITE_HASH)}catch(x){}$("gerr").textContent="";start()}
-    else $("gerr").textContent="Wrong password."
-  }catch(x){$("gerr").textContent="Error: "+x.message}
+    const j=await check(v);
+    if(!j){$("gerr").textContent="Invalid or expired key.";return}
+    if(j.admin){try{sessionStorage.setItem("gs-pw",v)}catch(e){}setAdmin(true)}
+    else{try{localStorage.setItem("gs-key",v.toUpperCase())}catch(e){}}
+    $("gerr").textContent="";start();
+  }catch(e){$("gerr").textContent="Can't reach the server. Try again."}
 }
 $("gform").addEventListener("submit",e=>{e.preventDefault();trySite()});
 $("gbtn").addEventListener("click",trySite);
+(async()=>{
+  const v=cred();if(!v)return;
+  try{const j=await check(v);if(j)start();else lockOut("Your access has ended. Enter a new key.")}catch(e){}
+})();
 </script>
-
-
-<script async="" src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="48a6a1e6-c106-4f46-9da3-e24cb4ad958a" data-app-host="app.netlify.com" data-account-tier="free"></script>
-<iframe id="nl-badge-frame" title="Powered by Netlify" srcdoc="<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style>
-    :root{--nl-vw:1180px;--nl-vh:688px}
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:transparent;overflow:hidden}
-    body{display:flex;align-items:flex-end;justify-content:flex-end;height:100vh;
-      padding:8px 18px 18px 8px;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#f4f9f9;-webkit-font-smoothing:antialiased}
-    .nl-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px;width:max-content;max-width:calc(var(--nl-vw,100vw) - 26px)}
-    button{font-family:inherit;cursor:pointer}
-    :focus-visible{outline:2px solid #32e6e2;outline-offset:2px;border-radius:6px}
-    .nl-icon-btn{position:relative;flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:#d5e3e6;transition:background .15s ease,color .15s ease}
-    .nl-icon-btn:hover{background:rgba(255,255,255,0.08);color:#f4f9f9}
-    .nl-tap::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-      width:max(100%,44px);height:max(100%,44px)}
-    @keyframes nl-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
-  
-      .nl-card{position:relative;display:none;width:min(340px,calc(var(--nl-vw,100vw) - 26px));max-height:calc(var(--nl-vh,100vh) - 84px);overflow-y:auto;background:linear-gradient(180deg,#132832 0%,#0e1e25 100%);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;transform-origin:bottom right;animation:nl-rise .3s cubic-bezier(.34,1.4,.4,1) both}
-      .nl-card.open{display:block}
-      .nl-card-close{position:absolute;top:10px;right:10px}
-      .nl-card h2{margin:0;padding-right:30px;font-size:16px;font-weight:750;letter-spacing:-0.015em;line-height:1.35}
-      .nl-card h2 em{font-style:normal;background:linear-gradient(90deg,#32e6e2,#4d7cfe,#9a6bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-      .nl-card p{margin:8px 0 0;font-size:12.5px;color:#d5e3e6}
-      .nl-prompt{position:relative;margin-top:14px;background:#10222b;border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
-      .nl-prompt:focus-within{border-color:#05bdba;box-shadow:0 0 0 3px rgba(5,189,186,0.18)}
-      .nl-prompt textarea{display:block;width:100%;height:38px;resize:none;border:0;outline:none;background:transparent;color:#f4f9f9;font:inherit;font-size:13px;line-height:19px;padding:0 28px 0 0}
-      .nl-prompt textarea::placeholder{color:#a9bdc2}
-      .nl-send{position:absolute;right:9px;bottom:9px;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#05bdba;color:#02191b;transition:background .15s ease}
-      .nl-send:hover{background:#32e6e2}
-      @media (pointer: coarse){
-        .nl-prompt textarea{font-size:16px;line-height:21px;height:42px}
-      }
-      .nl-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#a9bdc2}
-      .nl-or::before,.nl-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.09)}
-      .nl-drop{display:flex;align-items:center;justify-content:space-between;gap:6px;text-decoration:none;background:#1b3a45;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:#cfe0e3;transition:background .15s ease,color .15s ease,border-color .15s ease}
-      .nl-drop:hover{background:#224753;color:#f4f9f9;border-color:rgba(50,230,226,0.3)}
-      .nl-drop .nl-arrow{transition:transform .18s cubic-bezier(.34,1.4,.4,1)}
-      .nl-drop:hover .nl-arrow{transform:translateX(3px)}
-      .nl-badge{display:flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(180deg,#142b34,#0e1e25);color:#f4f9f9;border-radius:999px;padding:9px 14px 9px 11px;font-size:13px;font-weight:600;letter-spacing:0.01em;transition:border-color .2s ease}
-      .nl-badge:hover{border-color:rgba(50,230,226,0.26)}
-      .nl-hide{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:#a9bdc2;font-size:11.5px;font-weight:600;padding:4px;border-radius:8px;transition:color .15s ease}
-      .nl-hide:hover{color:#d5e3e6;text-decoration:underline}
-      .nl-badge-label{color:#d5e3e6;font-weight:500}
-      .nl-badge-brand{font-weight:750}
-    </style></head><body>
-      <div class="nl-wrap">
-        <section class="nl-card" id="nl-card" aria-label="Build your own site on Netlify">
-          <button type="button" class="nl-icon-btn nl-tap nl-card-close" id="nl-card-close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"/></svg></button>
-          <h2><em>Build your own site with Netlify</em></h2>
-          <p>Describe what you want, and an AI agent designs, builds and deploys it in minutes.</p>
-          <form class="nl-prompt" action="https://app.netlify.com/start" method="get" target="_blank" rel="noopener">
-            <textarea name="prompt" rows="2" required maxlength="300" autocomplete="off"
-                      enterkeyhint="go"
-                      placeholder="A shop for my handmade surfboards&hellip;"
-                      aria-label="Describe the site you want to build"></textarea>
-            <button type="submit" class="nl-send nl-tap" aria-label="Build this site"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12.75v-9.5M3.9 7.35 8 3.25l4.1 4.1"/></svg></button>
-            <input type="hidden" name="utm_source" value="netlify_badge">
-            <input type="hidden" name="utm_campaign" value="loops">
-            <input type="hidden" name="utm_medium" value="owned">
-            <input type="hidden" name="utm_content" value="prompt">
-            <input type="hidden" name="utm_id" value="48a6a1e6-c106-4f46-9da3-e24cb4ad958a">
-            
-          </form>
-          <div class="nl-or"><span>or</span></div>
-          <a class="nl-drop" href="https://app.netlify.com/drop?utm_source=netlify_badge&utm_campaign=loops&utm_medium=owned&utm_content=drop&utm_id=48a6a1e6-c106-4f46-9da3-e24cb4ad958a" target="_blank" rel="noopener">
-            <span>Drop a site you already have</span><span class="nl-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-          
-        </section>
-        <button type="button" class="nl-badge" id="nl-badge" aria-expanded="false" aria-controls="nl-card"
-                aria-label="Powered by Netlify — build your own site">
-          <svg width="18" height="18" viewBox="-45.625 -47.625 456.25 456.25" fill="none" aria-hidden="true">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M122.608 207.222V298.975C122.608 301.415 123.574 303.775 125.317 305.518L177.467 357.668C181.06 361.261 186.932 361.261 190.525 357.668L232.675 315.519C236.268 311.926 236.268 306.053 232.675 302.434L133.119 202.878C129.231 198.99 122.608 201.726 122.608 207.222Z" fill="white"/>
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M232.675 44.8449L190.525 2.69468C186.932 -0.898228 181.06 -0.898228 177.467 2.69468L125.317 54.846C123.574 56.5889 122.608 58.922 122.608 61.362V153.115C122.608 158.584 129.231 161.346 133.119 157.459L232.675 57.9031C236.268 54.3101 236.268 48.4385 232.675 44.8187V44.8449Z" fill="white"/>
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M307.482 126.543L151.056 174.243C145.238 176.012 145.238 184.243 151.056 186.013L307.482 233.713C310.726 234.705 314.319 233.82 316.706 231.407L361.483 186.629C365.076 183.036 365.076 177.165 361.483 173.545L316.706 128.767C314.292 126.354 310.753 125.469 307.482 126.462V126.515V126.543Z" fill="white"/>
-    <path d="M48.6878 131.481L6.52195 173.647C2.91992 177.249 2.91992 183.089 6.52195 186.691L48.6883 228.857C52.2903 232.459 58.1302 232.459 61.7322 228.857L103.898 186.691C107.5 183.089 107.5 177.249 103.898 173.647L61.7317 131.481C58.1297 127.879 52.2899 127.879 48.6878 131.481Z" fill="white"/></svg>
-          <span><span class="nl-badge-label">Powered by</span> <span class="nl-badge-brand">Netlify</span></span>
-        </button>
-      </div>
-      <script>
-        
-    function nlSend(){
-      var wrap=document.querySelector('.nl-wrap'),boxes=[];
-      for(var i=0;i<wrap.children.length;i++){
-        var c=wrap.children[i];
-        if(!c.offsetWidth||!c.offsetHeight)continue;
-        boxes.push({x:c.offsetLeft-wrap.offsetLeft+8,
-                    y:c.offsetTop-wrap.offsetTop+8,
-                    w:c.offsetWidth,h:c.offsetHeight});
-      }
-      parent.postMessage({nlHud:'resize',
-        width:wrap.offsetWidth+26,
-        height:wrap.offsetHeight+26,
-        boxes:boxes},'*');
-    }
-    function nlSendSoon(){requestAnimationFrame(nlSend);}
-    window.addEventListener('load',nlSend);
-    window.addEventListener('message',function(e){
-      if(e.source!==parent||!e.data||e.data.nlHud!=='viewport')return;
-      var s=document.documentElement.style;
-      s.setProperty('--nl-vw',e.data.w+'px');
-      s.setProperty('--nl-vh',e.data.h+'px');
-      document.documentElement.classList.toggle('nl-narrow',e.data.w<600);
-      nlSendSoon();
-    });
-    var nlCoarse=window.matchMedia('(pointer: coarse)').matches;
-    function nlSubmit(form){
-      if(form.requestSubmit)return form.requestSubmit();
-      if(form.checkValidity&&!form.checkValidity())
-        return form.reportValidity&&form.reportValidity();
-      form.submit();
-    }
-  
-        var badge=document.getElementById('nl-badge'),card=document.getElementById('nl-card'),
-            box=card.querySelector('textarea');
-        function setOpen(open){
-          card.classList.toggle('open',open);
-          badge.setAttribute('aria-expanded',open?'true':'false');
-          nlSendSoon();
-          if(open&&!nlCoarse)box.focus();
-        }
-        box.addEventListener('keydown',function(e){
-          if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();nlSubmit(box.form);}
-        });
-        badge.addEventListener('click',function(){setOpen(!card.classList.contains('open'));});
-        document.getElementById('nl-card-close').addEventListener('click',function(){setOpen(false);badge.focus();});
-        document.addEventListener('keydown',function(e){
-          if(e.key==='Escape'&&card.classList.contains('open')){setOpen(false);badge.focus();}
-        });
-        card.addEventListener('click',function(e){
-          if(e.target.closest('#nl-hide'))parent.postMessage({nlHud:'state',value:'hidden'},'*');
-        });
-      </script>
-    </body></html>" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: none; color-scheme: dark; z-index: 2147483645; width: 202px; height: 64px; clip-path: path("M 3 3 H 189 V 51 H 3 Z");" data-nl-ready="1"></iframe></body></html>
+</body>
+</html>
